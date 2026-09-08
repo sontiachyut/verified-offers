@@ -14,4 +14,6 @@ Phases are acceptance-gated. Sessions can span multiple days; dates follow actua
 
 Initial seven-session sprint: 1 specs/P1; 2 PostgreSQL; 3 concurrency + outbox; 4 publisher/indexer; 5 search + freshness tests; 6 thin UI; 7 recovery demo/docs. P5/P6 can extend beyond the sprint. Do not call the full specification complete after P1.
 
-First P2 task: write a persistence ADR and PostgreSQL integration tests for concurrent first insert, identical replay, conflicting same-version payload and lower-version replay before implementing the JDBC adapter.
+P2 functional gate completed: see [transaction decisions](adr/0002-postgres-transactions.md) and [validation](validation/P2.md). Deployment security remains open.
+
+Next P3 task: define publisher claim/recovery and duplicate-event semantics in an ADR, then write crash-after-publish/before-marking-delivered tests. Add index version ordering, tombstones and authoritative search rechecks.

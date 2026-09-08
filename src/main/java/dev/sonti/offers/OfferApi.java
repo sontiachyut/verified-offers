@@ -17,11 +17,11 @@ class DemoConfiguration {
 }
 
 @RestController
-@Profile("local-demo")
+@Profile({"local-demo", "postgres-local"})
 @RequestMapping("/api/v1")
 class OfferApi {
-    private final Catalog catalog;
-    OfferApi(Catalog catalog) { this.catalog = catalog; }
+    private final OfferCatalog catalog;
+    OfferApi(OfferCatalog catalog) { this.catalog = catalog; }
 
     @PutMapping("/offers")
     Offer ingest(@RequestBody Offer offer) { return catalog.ingest(offer); }

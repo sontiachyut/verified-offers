@@ -1,6 +1,7 @@
 # Verified Offers — product and engineering specification
 
 Status: approved project direction; implementation progresses only through acceptance gates.
+P2 clarification: ADR 0002 defines implemented persistence, locking, timestamp and local-profile semantics and supersedes preliminary P2 design details below. Authentication remains a predeployment gate; postgres-local is not a public production profile.
 Primary question: can a shopper trust the price and availability presented by a search result?
 
 ## Product and boundaries
@@ -51,15 +52,16 @@ P1 local-demo endpoints:
 Offer body: tenantId, merchantId, offerId, version, title, priceMinor, currency, availableQuantity, sourceUpdatedAt, deleted.
 Verification precedence: NOT_FOUND -> DELETED -> STALE -> MISMATCH -> UNAVAILABLE -> VERIFIED.
 400 validation, 404 unknown lookup, 409 version/payload conflict, 503 bounded demo capacity. ProblemDetail JSON; no stack traces.
-P2+ derive tenant identity from auth, version/document the API change and remove untrusted tenant scope.
+Before shared deployment, derive tenant identity from auth, version/document the API change and remove untrusted tenant scope. P2 postgres-local still uses explicitly untrusted demo tenant fields.
 P3 GET /api/v1/search?q=&limit=&cursor= returns bounded results and source/index timestamps. Cursor ties to a stable search snapshot; avoid unbounded offsets.
 P4 bulk feeds are bounded asynchronous jobs with jobId, checksum, per-row failures and restart behavior; no arbitrary URL fetch/SSRF surface.
 
 ## Persistent model (P2 design)
 
-offer_head PK(tenant_id,merchant_id,offer_id): version, price_minor BIGINT CHECK >=0, currency, available_quantity INT CHECK >=0, source_updated_at, received_at, deleted, title, payload_hash.
-offer_version PK(identity,version): immutable source payload and hash. Unique head/version consistency enforced transactionally.
-outbox: event_id PK, aggregate/version, payload, created_at, published_at, attempts, lease.
+offer_key PK(tenant_id,merchant_id,offer_id): stable identity/lock row for first-write concurrency.
+offer_head PK(identity): current version; composite FK references immutable history.
+offer_version PK(identity,version): constrained typed price/currency/quantity, source_updated_at, received_at, deleted, complete JSON snapshot and canonical payload hash.
+outbox: event_id PK, event_type, tenant_id, aggregate_id/version, schema_version, complete envelope, created_at, published_at. Publisher attempts/leases will be introduced with P3.
 Atomic ingestion locks/conditionally updates current head after handling concurrent first inserts; head/version/outbox written together. Conflicting source versions return 409, not silent last-writer-wins.
 Index is disposable; PostgreSQL is authoritative. Rebuild must not reintroduce deleted/old data.
 

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Bounded, volatile reference adapter. Synchronization is NOT distributed concurrency control. */
-public final class Catalog {
+public final class Catalog implements OfferCatalog {
     private record Key(String tenantId, String merchantId, String offerId) {
         Key {
             Input.identifier(tenantId);
@@ -64,16 +64,7 @@ public final class Catalog {
     }
 
     public synchronized Verification verify(Claim claim) {
-        Instant now = clock.instant();
         Offer offer = offers.get(new Key(claim.tenantId(), claim.merchantId(), claim.offerId()));
-        if (offer == null) return new Verification(Outcome.NOT_FOUND, null, null, now);
-        Outcome outcome;
-        if (offer.deleted()) outcome = Outcome.DELETED;
-        else if (offer.sourceUpdatedAt().isAfter(now)
-                || Duration.between(offer.sourceUpdatedAt(), now).compareTo(freshness) >= 0) outcome = Outcome.STALE;
-        else if (offer.priceMinor() != claim.priceMinor() || !offer.currency().equals(claim.currency())) outcome = Outcome.MISMATCH;
-        else if (offer.availableQuantity() == 0) outcome = Outcome.UNAVAILABLE;
-        else outcome = Outcome.VERIFIED;
-        return new Verification(outcome, offer.version(), offer.sourceUpdatedAt(), now);
+        return VerificationPolicy.verify(offer, claim, clock.instant(), freshness);
     }
 }

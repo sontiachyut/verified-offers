@@ -14,5 +14,6 @@ public record Offer(String tenantId, String merchantId, String offerId, long ver
                 || sourceUpdatedAt == null) {
             throw new IllegalArgumentException("Invalid offer facts.");
         }
+        sourceUpdatedAt = sourceUpdatedAt.truncatedTo(java.time.temporal.ChronoUnit.MICROS);
     }
 }
