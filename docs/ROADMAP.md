@@ -17,3 +17,8 @@ Initial seven-session sprint: 1 specs/P1; 2 PostgreSQL; 3 concurrency + outbox; 
 P2 functional gate completed: see [transaction decisions](adr/0002-postgres-transactions.md) and [validation](validation/P2.md). Deployment security remains open.
 
 Next P3 task: define publisher claim/recovery and duplicate-event semantics in an ADR, then write crash-after-publish/before-marking-delivered tests. Add index version ordering, tombstones and authoritative search rechecks.
+
+P3 is split into acceptance slices: P3a database-backed relay and failure recovery
+([ADR 0003](adr/0003-outbox-delivery.md)); P3b actual Kafka delivery; P3c OpenSearch
+projection/rebuild and authoritative search verification. Completion of P3a does
+not complete the P3 phase.

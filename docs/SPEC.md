@@ -2,6 +2,7 @@
 
 Status: approved project direction; implementation progresses only through acceptance gates.
 P2 clarification: ADR 0002 defines implemented persistence, locking, timestamp and local-profile semantics and supersedes preliminary P2 design details below. Authentication remains a predeployment gate; postgres-local is not a public production profile.
+P3 clarification: ADR 0003 defines lease fencing, retry/quarantine/replay and future index ordering. P3a implements only the PostgreSQL relay boundary; broker and search acceptance remain open.
 Primary question: can a shopper trust the price and availability presented by a search result?
 
 ## Product and boundaries

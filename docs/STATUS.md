@@ -1,6 +1,6 @@
 # Current status
 
-Last updated: 2026-09-08
+Last updated: 2026-09-14
 
 ## Completed
 
@@ -13,7 +13,11 @@ Last updated: 2026-09-08
 
 ## Exact next task: P3 event delivery and retrieval
 
-Write the outbox publication/index-version ADR and failure-oriented Kafka/OpenSearch tests before implementing workers. Define publisher claim/lease recovery, at-least-once publication, duplicate handling, tombstone/version ordering and index rebuild. Search must recheck authoritative PostgreSQL facts. Start with crash-after-publish/before-marking-delivered tests.
+ADR 0003 now defines publication leases, retry/quarantine and replay, with
+monotonic version/tombstone requirements for the later index. Next implement P3a:
+failure-oriented PostgreSQL relay tests followed by the lease store and relay.
+Start with crash-after-publish/before-marking-delivered tests. Actual Kafka and
+OpenSearch integration remain P3b/P3c; search must recheck authoritative facts.
 
 ## Explicit limits / open decisions
 
