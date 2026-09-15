@@ -17,8 +17,9 @@ Initial seven-session sprint: 1 specs/P1; 2 PostgreSQL; 3 concurrency + outbox; 
 P2 functional gate completed: see [transaction decisions](adr/0002-postgres-transactions.md) and [validation](validation/P2.md). Deployment security remains open.
 
 P3a completed: database lease/retry/quarantine/replay and relay failure tests.
-See [validation](validation/P3a.md). Next: an acknowledged Kafka adapter and
-real broker outage/replay tests before enabling a local publisher.
+See [validation](validation/P3a.md). P3b is now implemented and tested with
+real broker acknowledgement, outage/recovery, replay and packaged API shutdown;
+see [Kafka validation](validation/P3b.md). P3c retrieval remains next.
 
 P3 is split into acceptance slices: P3a database-backed relay and failure recovery
 ([ADR 0003](adr/0003-outbox-delivery.md)); P3b actual Kafka delivery; P3c OpenSearch

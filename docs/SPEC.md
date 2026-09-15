@@ -2,7 +2,7 @@
 
 Status: approved project direction; implementation progresses only through acceptance gates.
 P2 clarification: ADR 0002 defines implemented persistence, locking, timestamp and local-profile semantics and supersedes preliminary P2 design details below. Authentication remains a predeployment gate; postgres-local is not a public production profile.
-P3 clarification: ADR 0003 defines lease fencing, retry/quarantine/replay and future index ordering. P3a implements only the PostgreSQL relay boundary; broker and search acceptance remain open.
+P3 clarification: ADR 0003 defines lease fencing, retry/quarantine/replay and future index ordering. P3b adds an opt-in Kafka publisher through the official Java client; search acceptance remains separate.
 Primary question: can a shopper trust the price and availability presented by a search result?
 
 ## Product and boundaries
@@ -90,7 +90,7 @@ Failure demo: pause the indexer, change price/stock, show authoritative verifica
 |---|---|---|
 | Backend | Java 21, Spring Boot 4.1.1, Maven 3.9.16 wrapper | Existing Java experience, explicit domain types, mature HTTP/testing tooling; versions verified against official documentation and Maven Central |
 | Persistence (P2) | PostgreSQL 17, Flyway, Spring JDBC | Explicit transactions, constraints and concurrency behavior; avoid hiding critical SQL behind ORM behavior |
-| Messaging (P3) | Apache Kafka, official Java client through Spring Kafka | Ordered per-aggregate events and replay; transactional outbox bridges database commits to at-least-once publication |
+| Messaging (P3) | Apache Kafka, official Java client; Spring-managed publisher lifecycle | Acknowledged sends and replay; transactional outbox bridges database commits to at-least-once publication; consumers enforce source version order |
 | UI (P4+) | React, TypeScript, Vite | Small inspectable product console; not another business logic authority |
 | Tests | JUnit, Spring HTTP integration tests; Testcontainers/PostgreSQL and Kafka at their adoption phases | Test business invariants and real storage behavior; never use H2 as proof of PostgreSQL locking |
 | Operations (P5+) | Micrometer/OpenTelemetry, Prometheus/Grafana, structured logs, k6 | Trace actual bottlenecks and reproduce measured results |

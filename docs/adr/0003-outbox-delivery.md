@@ -64,6 +64,37 @@ catch-up and stale-candidate tests remain a separate P3 acceptance gate.
 
 ## Evidence and references
 
+### P3b implementation decisions
+
+Use the official Kafka Java client directly, with Spring owning the sink and
+scheduled worker lifecycle. This replaces the preliminary Spring Kafka wrapper
+choice: the adapter needs one explicit synchronous acknowledgement boundary and
+no listener containers yet. Dependency versions come from the existing Spring
+Boot BOM (Kafka client 4.2.1). Use the matching Apache Kafka 4.2.1 broker image,
+pinned by manifest digest in tests and Compose, and record its vulnerability scan.
+
+One fixed-delay worker publishes one event per 250ms poll. Enable it only with
+`offers.publisher.enabled=true` under `postgres-local` and an explicit bootstrap
+address. Require a pre-created `offers.v1` topic (three partitions, seven days of
+retention); disable broker auto-creation. No admin topic creation at API startup.
+Kafka uses 5s max-block, 10s delivery, 5s request and 0ms linger limits, with a
+12s Future wait: nominal send/ack work fits within the 30s database lease. Producer
+idempotence and `acks=all` do not deduplicate outbox retries after a worker crash.
+Bound producer memory to 4MiB and record size to 64KiB. Close producers with a 5s
+deadline; stop the scheduler before its dependencies and allow an in-flight poll
+up to 25s on shutdown. A lost lease remains replayable after expiry.
+
+The worker records per-result counters and catches database exceptions so one
+failed poll cannot permanently cancel scheduling. No payloads or exception text
+are logged by the poller. A broker failure is a retry/quarantine outcome; the
+catalog API can remain available while the broker is down. `/actuator/health`
+does not claim broker readiness or bounded indexing lag.
+
+Tests will use actual broker acknowledgement, consume original envelopes,
+pause/unpause the isolated broker for timeout/recovery, replay after an injected
+acknowledgement/database gap, and start the packaged API with publishing enabled.
+The outage test is a single-node pause, not a distributed broker failover test.
+
 P3a tests must cover crash after publish, competing workers, expiry fencing,
 failed/interrupted sends, retry timing, exhausted crash recovery, audit replay,
 tenant keys and unchanged tombstone envelopes. They establish database/relay

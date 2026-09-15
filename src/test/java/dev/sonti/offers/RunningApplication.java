@@ -20,9 +20,11 @@ final class RunningApplication implements AutoCloseable {
     private final JsonMapper json = JsonMapper.builder().build();
     private final HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
-    RunningApplication() throws Exception {
-        var builder = new ProcessBuilder(System.getProperty("java.home") + "/bin/java", "-jar",
-                "target/verified-offers-0.1.0-SNAPSHOT.jar", "--spring.profiles.active=postgres-local", "--server.port=0");
+    RunningApplication(String... extraArguments) throws Exception {
+        var command = new java.util.ArrayList<>(java.util.List.of(System.getProperty("java.home") + "/bin/java", "-jar",
+                "target/verified-offers-0.1.0-SNAPSHOT.jar", "--spring.profiles.active=postgres-local", "--server.port=0"));
+        command.addAll(java.util.List.of(extraArguments));
+        var builder = new ProcessBuilder(command);
         builder.environment().put("APP_DATABASE_URL", PostgresFixture.postgres.getJdbcUrl());
         builder.environment().put("APP_DATABASE_USER", PostgresFixture.postgres.getUsername());
         builder.environment().put("APP_DATABASE_PASSWORD", PostgresFixture.postgres.getPassword());
@@ -81,7 +83,10 @@ final class RunningApplication implements AutoCloseable {
         client.close();
         if (process.isAlive()) {
             process.destroy();
-            if (!process.waitFor(5, TimeUnit.SECONDS)) crash();
+            if (!process.waitFor(35, TimeUnit.SECONDS)) {
+                crash();
+                throw new IllegalStateException("Application exceeded graceful shutdown deadline.");
+            }
         }
     }
 }

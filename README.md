@@ -4,7 +4,7 @@ Check whether a merchant offer is current and supported by its source facts.
 
 [![verify](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml/badge.svg)](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml)
 
-An incremental backend engineering project. **P3a adds recoverable outbox delivery with PostgreSQL leases and failure tests.** This is a local development system, not a production deployment or a large-scale performance claim.
+An incremental backend engineering project. **P3b connects the transactional outbox to Apache Kafka with tested acknowledgement and outage recovery.** This is a local development system, not a production deployment or a large-scale performance claim.
 
 ## Run it
 
@@ -15,7 +15,7 @@ Requirements: Java 21 and a running Docker daemon. Node.js 22+ and make are need
 make demo
 ```
 
-Verification starts isolated PostgreSQL containers and tests the packaged API. The final HTTP walkthrough uses fresh in-memory state on a dynamic loopback port. Tests clean up their own containers/processes; no paid services or external merchant data are used.
+Verification starts isolated PostgreSQL and Kafka containers and tests the packaged API. The final HTTP walkthrough uses fresh in-memory state on a dynamic loopback port. Tests clean up their own containers/processes; no paid services or external merchant data are used.
 
 For persistent exploration, follow the [PostgreSQL setup](docs/POSTGRES.md). For the volatile reference implementation:
 
@@ -33,15 +33,16 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Concurrent first-write serialization, tenant-key separation, timestamp normalization and rollback on outbox failure.
 - Packaged API restart recovery: committed offers survive a forced JVM stop without duplicate events.
 - An outbox relay with worker leases, expiry fencing, bounded retries, quarantine and audited replay.
-- 46 passing tests, including destination-acknowledgement/crash replay, competing workers and migration of existing events. See [P3a evidence](docs/validation/P3a.md).
+- Opt-in background publishing to Kafka, with bounded I/O, graceful shutdown and per-result counters.
+- 55 passing tests, including real broker outage/recovery, replay across the acknowledgement gap, competing workers and migration of existing events. See [P3b evidence](docs/validation/P3b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
 ## Next phases — not yet implemented
 
-Kafka outbox publication, OpenSearch retrieval, merchant feed jobs and a React investigation console. Search will recheck authoritative facts. Optional Python claim extraction follows an independently evaluated deterministic baseline.
+OpenSearch retrieval, merchant feed jobs and a React investigation console. Search will recheck authoritative facts. Optional Python claim extraction follows an independently evaluated deterministic baseline.
 
-The relay is exercised with controlled sinks and real PostgreSQL; **Kafka delivery and a background publisher are not connected yet**. Authentication, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned database image has [known security findings](docs/validation/IMAGE-SECURITY.md); public deployment is not approved.
+Kafka delivery is implemented; **the search/index consumer is not implemented yet**. Publishing is disabled unless explicitly enabled under the persistent local profile. Authentication, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md) and [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) images have known security findings; public deployment is not approved.
 
 ## Engineering documents
 
