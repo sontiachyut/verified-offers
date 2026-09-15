@@ -29,6 +29,11 @@ For the full current flow—API → PostgreSQL outbox → Kafka—follow the
 consumer, outage/recovery and shutdown commands. The Compose `messaging` profile
 starts a single local broker only when requested.
 
+For the complete search flow, follow the [OpenSearch walkthrough](docs/SEARCH.md).
+It covers explicit alias provisioning, verified results, pausing/resuming the
+indexer and graceful shutdown. The separate Compose `search` profile keeps the
+index off unless requested.
+
 Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full acceptance gate.
 
 ## What works today
