@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   java:
-    name: Unit, PostgreSQL, Kafka and recovery tests
+    name: Unit, PostgreSQL, Kafka, OpenSearch and recovery tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

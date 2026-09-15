@@ -4,6 +4,9 @@ Status: approved project direction; implementation progresses only through accep
 P2 clarification: ADR 0002 defines implemented persistence, locking, timestamp and local-profile semantics and supersedes preliminary P2 design details below. Authentication remains a predeployment gate; postgres-local is not a public production profile.
 P3 clarification: ADR 0003 defines lease fencing, retry/quarantine/replay and future index ordering. P3b adds an opt-in Kafka publisher through the official Java client; search acceptance remains separate.
 Primary question: can a shopper trust the price and availability presented by a search result?
+P3c clarification: ADR 0004 defines fail-closed top-N search, external-version
+consumer idempotence and poison quarantine; online rebuild and PIT pagination
+remain separate gates.
 
 ## Product and boundaries
 

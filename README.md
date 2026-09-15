@@ -4,7 +4,7 @@ Check whether a merchant offer is current and supported by its source facts.
 
 [![verify](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml/badge.svg)](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml)
 
-An incremental backend engineering project. **P3b connects the transactional outbox to Apache Kafka with tested acknowledgement and outage recovery.** This is a local development system, not a production deployment or a large-scale performance claim.
+An incremental backend engineering project. **Kafka now feeds an OpenSearch projection, and search rechecks current PostgreSQL facts before returning verified offers.** This is a local development system, not a production deployment or a large-scale performance claim.
 
 ## Run it
 
@@ -15,7 +15,7 @@ Requirements: Java 21 and a running Docker daemon. Node.js 22+ and make are need
 make demo
 ```
 
-Verification starts isolated PostgreSQL and Kafka containers and tests the packaged API. The final HTTP walkthrough uses fresh in-memory state on a dynamic loopback port. Tests clean up their own containers/processes; no paid services or external merchant data are used.
+Verification starts isolated PostgreSQL, Kafka and OpenSearch containers and tests the packaged API. The final HTTP walkthrough uses fresh in-memory state on a dynamic loopback port. Tests clean up their own containers/processes; no paid services or external merchant data are used.
 
 For persistent exploration, follow the [PostgreSQL setup](docs/POSTGRES.md). For the volatile reference implementation:
 
@@ -39,15 +39,17 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Packaged API restart recovery: committed offers survive a forced JVM stop without duplicate events.
 - An outbox relay with worker leases, expiry fencing, bounded retries, quarantine and audited replay.
 - Opt-in background publishing to Kafka, with bounded I/O, graceful shutdown and per-result counters.
-- 55 passing tests, including real broker outage/recovery, replay across the acknowledgement gap, competing workers and migration of existing events. See [P3b evidence](docs/validation/P3b.md).
+- Replay-safe OpenSearch indexing with external versions, retained tombstones, durable poison-event quarantine and manual Kafka offset commits.
+- Tenant-filtered lexical search with one bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection.
+- 70 passing tests, including actual database/broker/index integration, crash-gap replay and index-outage HTTP 503 behavior. See [search evidence](docs/validation/P3c1.md) and [Kafka evidence](docs/validation/P3b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
 ## Next phases — not yet implemented
 
-OpenSearch retrieval, merchant feed jobs and a React investigation console. Search will recheck authoritative facts. Optional Python claim extraction follows an independently evaluated deterministic baseline.
+Online index rebuild/catch-up/alias switching, stable pagination, merchant feed jobs and a React investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
 
-Kafka delivery is implemented; **the search/index consumer is not implemented yet**. Publishing is disabled unless explicitly enabled under the persistent local profile. Authentication, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md) and [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) images have known security findings; public deployment is not approved.
+Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. P3c1 delivers top-N search, not the full P3 rebuild gate. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
 
 ## Engineering documents
 
@@ -57,6 +59,7 @@ Kafka delivery is implemented; **the search/index consumer is not implemented ye
 - [Architecture boundaries](docs/adr/0001-boundaries-and-proof.md) and [PostgreSQL transaction decisions](docs/adr/0002-postgres-transactions.md)
 - [Reference demo](docs/DEMO.md) and [persistent local profile](docs/POSTGRES.md)
 - [Outbox recovery walkthrough and runbook](docs/OUTBOX.md) and [delivery decisions](docs/adr/0003-outbox-delivery.md)
+- [Search projection decisions](docs/adr/0004-search-projection.md) and [validation](docs/validation/P3c1.md)
 - [P2 validation evidence](docs/validation/P2.md) and [historical P1 record](docs/validation/P1.md)
 - [Optional companion-project integration](docs/INTEGRATION.md)
 

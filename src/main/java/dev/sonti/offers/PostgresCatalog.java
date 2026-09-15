@@ -94,6 +94,20 @@ public final class PostgresCatalog implements OfferCatalog {
         return VerificationPolicy.verify(offer, claim, clock.instant(), freshness);
     }
 
+    @Override public List<Offer> currentSnapshots(List<Offer> candidates) {
+        if (candidates.size() > 250) throw new IllegalArgumentException("Too many candidates.");
+        if (candidates.isEmpty()) return List.of();
+        String identities = json.writeValueAsString(candidates.stream().map(offer -> Map.of(
+                "tenant_id", offer.tenantId(), "merchant_id", offer.merchantId(), "offer_id", offer.offerId())).toList());
+        return sql.query("""
+                SELECT v.payload::text FROM offer_head h JOIN offer_version v
+                USING (tenant_id,merchant_id,offer_id,version)
+                WHERE EXISTS (SELECT 1 FROM jsonb_to_recordset(?::jsonb)
+                    AS k(tenant_id text,merchant_id text,offer_id text)
+                    WHERE (k.tenant_id,k.merchant_id,k.offer_id) = (h.tenant_id,h.merchant_id,h.offer_id))
+                """, (rs, row) -> json.readValue(rs.getString(1), Offer.class), identities);
+    }
+
     private static String sha256(String payload) {
         try { return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload.getBytes(StandardCharsets.UTF_8))); }
         catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }

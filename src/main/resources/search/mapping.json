@@ -1,0 +1,18 @@
+{
+  "settings": {"number_of_shards": 1, "number_of_replicas": 0},
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "tenantId": {"type": "keyword"},
+      "merchantId": {"type": "keyword"},
+      "offerId": {"type": "keyword"},
+      "version": {"type": "long"},
+      "title": {"type": "text"},
+      "priceMinor": {"type": "long"},
+      "currency": {"type": "keyword"},
+      "availableQuantity": {"type": "integer"},
+      "sourceUpdatedAt": {"type": "keyword"},
+      "deleted": {"type": "boolean"}
+    }
+  }
+}
