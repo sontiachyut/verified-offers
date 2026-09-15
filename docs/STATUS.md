@@ -9,14 +9,14 @@ Last updated: 2026-09-14
 - P2: PostgreSQL 17.11, Flyway migrations, JDBC adapter and atomic transactional outbox. The in-memory adapter remains separately available.
 - P3a: PostgreSQL delivery leases, transport-independent outbox relay, bounded retries, quarantine and atomic audited replay. See [delivery decisions](adr/0003-outbox-delivery.md) and [runbook](OUTBOX.md).
 - P3b: acknowledged Kafka 4.2.1 adapter and opt-in Spring-managed publisher with bounded polling/I/O, result counters and graceful shutdown. Real broker pause/recovery and acknowledgement-gap replay tests pass.
+- Opt-in Compose broker and [Kafka runbook](KAFKA.md) exercised end to end: API ingest → Kafka console consumption → PostgreSQL publication record, using an isolated synthetic Compose project. Three partitions, seven-day retention and loopback port bindings verified.
 - 29 unit/HTTP/helper plus 26 PostgreSQL/Kafka/process integration tests pass locally with zero failures/errors/skips (55 total). The HTTP demo also passes. See [P3b evidence](validation/P3b.md) and historical [P3a evidence](validation/P3a.md).
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: finish local delivery runbook, then P3c retrieval
+## Exact next task: P3c retrieval
 
-Finish the opt-in Compose broker and local runbook, including topic creation and
-safe shutdown. Then implement P3c: an OpenSearch consumer with monotonic external
+Implement P3c: an OpenSearch consumer with monotonic external
 version updates and retained tombstones; duplicate/out-of-order/rebuild tests;
 and search results rechecked against current PostgreSQL facts. Pin/scan the index
 image before introduction. Follow ADR 0003 and keep P3 open until all retrieval

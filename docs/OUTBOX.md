@@ -3,8 +3,9 @@
 The catalog commits an offer, version history and a complete event envelope in
 one PostgreSQL transaction. `PostgresOutbox` and `OutboxRelay` now provide the
 next boundary: claiming, delivering, acknowledging and recovering those events.
-An actual Kafka adapter and background scheduling are the next milestone.
-Starting `postgres-local` still does **not** publish events.
+P3b now connects this boundary to a real Kafka adapter and an opt-in background
+publisher; see [the Kafka walkthrough](KAFKA.md). Starting `postgres-local`
+without explicitly enabling the publisher still does **not** publish events.
 
 ## Run the recovery scenarios
 
@@ -34,10 +35,10 @@ packaged API to validate catalog recovery.
 | `LEASE_LOST` | A send completed/failed after ownership expired or changed; no acknowledgement recorded |
 
 Database failures propagate to the caller; an interrupted send restores the
-thread interrupt flag. A future scheduler must pause on idle/failure, stop on
-interruption, and avoid busy loops. The sink must wait for actual destination
-acknowledgement with bounded I/O below the 30-second lease. P3a deliberately has
-no default sink that could mark an unsent event as published.
+thread interrupt flag. The P3b scheduler waits 250ms after each poll, including
+idle/failure, and checks interruption before claiming. The sink must wait for actual destination
+Kafka acknowledgement with bounded I/O below the 30-second lease. There is no
+default no-op sink that could mark an unsent event as published.
 
 All database transitions use short independent transactions. A relay cannot run
 inside an ambient database transaction. Separate workers can claim different

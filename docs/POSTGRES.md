@@ -24,7 +24,7 @@ The two projects use separate databases/volumes/ports. Do not point both at the 
 ## Test modes
 
 - `./mvnw test`: unit and in-memory HTTP tests only. Not the full acceptance gate.
-- `./mvnw verify`: unit tests, package, real PostgreSQL/Testcontainers tests, and packaged-process tests. Docker is required; unavailable Docker fails, not skips.
+- `./mvnw verify`: unit tests, package, real PostgreSQL/Kafka Testcontainers tests, and packaged-process tests. Docker is required; unavailable Docker fails, not skips.
 - `make demo`: full verification followed by the original local-demo walkthrough.
 - `make postgres-demo`: full verification including PostgreSQL process-restart assertions; prints the database test summaries.
 

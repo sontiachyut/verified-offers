@@ -49,6 +49,18 @@ exposed client port to loopback and are always cleaned up by the test lifecycle.
 
 ## Limits
 
+### Manual Compose check
+
+An isolated Compose project using the pinned images became healthy on loopback
+ports 5541 (PostgreSQL) and 9094 (Kafka). Topic inspection confirmed three
+partitions, replication factor one and `retention.ms=604800000`. A packaged API
+with an ephemeral loopback port ingested `demo:electronics:headphones`; the Kafka
+console consumer returned the corresponding schema-v1 `OfferUpdated` envelope.
+PostgreSQL showed `attempts=1` and `published_at IS NOT NULL`. The
+[walkthrough](../KAFKA.md) documents the same flow using the normal local ports.
+
+### Interpretation
+
 The crash between broker acknowledgement and database marking is injected with
 an uncaught `Error`; the Kafka record and PostgreSQL state are real. Broker pause
 is not a multi-node failover or broker-disk-loss test. Replication factor is one.

@@ -24,6 +24,11 @@ make run
 # localhost:8081; local-demo profile, state lost at shutdown
 ```
 
+For the full current flow—API → PostgreSQL outbox → Kafka—follow the
+[local Kafka walkthrough](docs/KAFKA.md). It includes topic creation, an actual
+consumer, outage/recovery and shutdown commands. The Compose `messaging` profile
+starts a single local broker only when requested.
+
 Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full acceptance gate.
 
 ## What works today
