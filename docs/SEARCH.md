@@ -65,9 +65,13 @@ as-of evidence. After five minutes without a fresh merchant source update, it
 disappears. This is not a reservation or a promise of stock at checkout.
 
 The endpoint returns only exact, eligible snapshots. Up to 5 × limit title matches
-are rechecked against PostgreSQL; lag, deletion, stock loss, price change or TTL
-expiry can produce fewer results. There is no exact total or pagination cursor.
-`q` is 1–200 characters; `limit` is 1–50. `cursor` requests return 400. Tenant is
+per page are rechecked against PostgreSQL; lag, deletion, stock loss, price change
+or TTL expiry can produce fewer results. There is no exact total. Follow
+`nextCursor` until null, even when a page's results are empty. See the
+[pagination guide](PAGINATION.md) for continuation, expiry, cancellation and
+resource admission. PIT ordering is stable across refresh/alias handoff, but
+current PostgreSQL eligibility is checked on every page.
+`q` is 1–200 characters; `limit` is 1–50. Tenant is
 untrusted demo scope, not authorization. A dependency outage returns 503 rather
 than trusting stale index data. Health is liveness, not indexing-lag readiness.
 
@@ -108,4 +112,5 @@ docker compose --profile search --profile messaging stop opensearch kafka postgr
 
 Named volumes remain. Quit Docker Desktop if no other work needs it. Do not run
 global prune or delete shared volumes. See [ADR 0004](adr/0004-search-projection.md)
-for design choices and remaining rebuild/pagination gates.
+for the original projection design and [ADR 0007](adr/0007-stable-search-pages.md)
+for current pagination behavior.

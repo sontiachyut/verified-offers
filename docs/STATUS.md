@@ -16,35 +16,31 @@ Last updated: 2026-09-16
 - Packaged snapshot-only create/step/status commands resume across JVM processes and force web/publisher/indexer/search off, even when inherited flags enable them. See the [snapshot runbook](REBUILD.md). These original jobs remain nonpromotable.
 - P3c2b: pre-snapshot Kafka topic/offset boundary, durable live-indexer pause, bounded source-validated replay, separately validated candidate, atomic alias handoff and forward reconciliation after a lost acknowledgement. Safe pre-switch abort is available; post-switch rollback is refused. See [ADR 0006](adr/0006-coordinated-index-handoff.md).
 - Coordinated begin/step/status/abort commands work across packaged JVM restarts, including inherited-worker override protection. See the [handoff runbook](HANDOFF.md). This uses an indexing pause, not zero-downtime cutover.
-- 43 unit/HTTP/helper plus 57 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (100 total). The four-assertion HTTP demo also passes. See [handoff evidence](validation/P3c2b.md), [rebuild evidence](validation/P3c2a.md) and [search evidence](validation/P3c1.md).
+- P3c3: bounded PIT/search-after pages, deterministic ordering, signed process-local cursors, current PostgreSQL verification on every page, cancellation and fixed expiry. Real index refresh/handoff/outage and packaged HTTP/restart tests pass. See [ADR 0007](adr/0007-stable-search-pages.md), [guide](PAGINATION.md) and [evidence](validation/P3c3.md).
+- 49 unit/HTTP/helper plus 61 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (110 total). The four-assertion HTTP demo also passes. The adapter milestone `8ba963d` separately passed 101 tests before API wiring. No benchmark or production readiness is implied.
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: stable search pagination
+## Exact next task: P4a merchant feed jobs
 
-In progress: [ADR 0007](adr/0007-stable-search-pages.md) defines the contract.
-The first slice adds PIT creation, deterministic search-after ordering and
-bounded PIT deletion to the adapter, with real-index alias/refresh tests.
-Adapter acceptance: full `./mvnw verify` passed 101 tests (43 unit, 58 integration),
-zero failures/errors/skips, on 2026-09-16. The test observes stable six-offer
-PIT ordering despite new documents, updated/deleted sources and alias replacement.
-The public API still rejects cursors until the session/verification layer lands.
-
-Define the PIT/search-after cursor contract before implementation: bounded
-lifetime/resource use, query/tenant binding, deterministic ordering, fail-closed
-expiry/error behavior and authoritative rechecks on every page. Test concurrent
-updates, deletions and alias handoff between pages without accepting stale facts.
-Do not claim P3 fully closed while its stable-pagination contract is absent.
-Audited index-quarantine replay/retention remains another open operator gate;
-merchant feed jobs and the React investigation UI follow in P4.
+The local P3 functional gate is complete, including rebuild and stable pages.
+Define the bounded feed-upload and durable job contract before implementation:
+input/row limits, checksum/idempotency, source provenance, per-row results,
+worker ownership and restart behavior. Reuse catalog ingestion invariants and
+the transactional outbox, without holding a transaction across an entire feed.
+Prove partial failures, duplicate submission and crash/restart recovery with
+synthetic fixtures. No arbitrary URL fetch or real merchant data. The React
+search/investigation UI follows the durable feed backend in P4b.
+Audited index-quarantine replay/retention remains an explicit operational gate.
 
 ## Explicit limits / open decisions
 
 - postgres-local persists state; local-demo remains volatile. Both profiles are unauthenticated and loopback-only. No real data or public exposure.
-- Publishing, search and indexing are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Default still accumulates outbox rows. No feed pipeline, UI or model integration yet. P3c1 completion does not complete P3.
+- Publishing, search and indexing are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Default still accumulates outbox rows. No feed pipeline, UI or model integration yet.
 - Images require security remediation/review: see [database scan](validation/IMAGE-SECURITY.md), [Kafka scan](validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch scan](validation/OPENSEARCH-IMAGE-SECURITY.md). Re-scan, production database roles, auth, restore drills and cloud sizing/cost remain deployment gates.
 - Correctness tests are not throughput, uptime, failover or representative scale measurements.
 - No billable cloud resources were created. The seven-session sprint is a planning aid, not a completeness promise.
 - Shadow snapshots are capped at 100,000 offers and ten retained jobs; a successful handoff uses two jobs. Replay is capped at 10,000 offsets and 32 partitions. Cleanup/retention is not implemented. SNAPSHOT_VALIDATED alone is not promotion approval.
 - All live indexers must run the gate-aware build. Mixed versions, foreign/transactional/compacted topic writers and manual concurrent alias administration are unsupported. A pause survives crashes; SWITCHING recovers forward, never by blind rollback. Retention loss during an uncertain switch can require reviewed repair.
-- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0006.
+- Search cursors are process-local, fixed at two minutes and invalid after restart. At most 128 reservations and eight in-flight page operations per process; completed/failed searches retain admission reservations for the expiry plus ten-second grace. This is a conservative local bound, not an HA/distributed quota or capacity result.
+- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0007.

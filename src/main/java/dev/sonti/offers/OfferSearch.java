@@ -25,8 +25,13 @@ public final class OfferSearch {
         if (query == null || query.isBlank() || query.length() > 200 || limit < 1 || limit > 50) {
             throw new IllegalArgumentException("Invalid search bounds.");
         }
-        var results = new ArrayList<Result>();
         var retrieved = candidates.find(tenant, query.strip(), limit * 5);
+        return new Results(verified(tenant, retrieved).stream().limit(limit).toList());
+    }
+
+    List<Result> verified(String tenant, List<Offer> retrieved) {
+        if (retrieved.size() > 250) throw new IllegalArgumentException("Too many search candidates.");
+        var results = new ArrayList<Result>();
         for (var candidate : retrieved) {
             if (!tenant.equals(candidate.tenantId())) throw new DomainException(503, "Invalid search scope.");
         }
@@ -39,9 +44,8 @@ public final class OfferSearch {
             var verification = VerificationPolicy.verify(current, claim, clock.instant(), Duration.ofMinutes(5));
             if (verification.outcome() != Catalog.Outcome.VERIFIED) continue;
             results.add(new Result(current, candidate.version(), candidate.sourceUpdatedAt(), verification));
-            if (results.size() == limit) break;
         }
-        return new Results(List.copyOf(results));
+        return List.copyOf(results);
     }
     private static List<String> identity(Offer offer) {
         return List.of(offer.tenantId(), offer.merchantId(), offer.offerId());

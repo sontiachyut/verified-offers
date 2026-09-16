@@ -1,6 +1,6 @@
 # ADR 0007: bounded point-in-time search pages
 
-Date: 2026-09-16. Accepted for incremental P3c3 implementation.
+Date: 2026-09-16. Implemented for the bounded local P3c3 gate.
 
 Use OpenSearch PIT plus search_after, not offsets or a new live query per page.
 Sort by score descending, merchantId ascending, offerId ascending; the latter
@@ -22,6 +22,10 @@ from clients. Malformed/tampered or mismatched-scope tokens return 400; expired,
 closed or process-restart-lost sessions return 410. Index/dependency failures
 return generic 503, never transparently create a replacement PIT. Tokens are
 not authentication; this remains loopback-only and uses untrusted demo tenants.
+DELETE on the same route accepts the cursor with its original scope and closes
+the session; repeat use (including repeated DELETE) returns 410. A well-shaped
+token naming an unknown session returns 410 before signature verification, so
+tokens from a previous process do not misleadingly suggest a fresh snapshot.
 
 Local resource admission allows 128 session reservations per process and eight
 in-flight page requests. Reservations survive completion/open failure until the
@@ -30,6 +34,7 @@ an open/close response is lost. Successful completion or explicit DELETE release
 the PIT early, but not its admission reservation. Abandoned PITs expire without
 renewal. Shutdown makes one bounded best-effort delete call for owned PITs.
 This is intentionally conservative, not a distributed quota or HA cursor store.
+Concurrent operations on the same session fail with 429 rather than queue.
 Restart invalidates cursors; multiple API instances/sticky routing are unsupported.
 
 Cursors can be retried while the session remains open, but verification outcomes

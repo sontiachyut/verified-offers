@@ -50,18 +50,19 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - An outbox relay with worker leases, expiry fencing, bounded retries, quarantine and audited replay.
 - Opt-in background publishing to Kafka, with bounded I/O, graceful shutdown and per-result counters.
 - Replay-safe OpenSearch indexing with external versions, retained tombstones, durable poison-event quarantine and manual Kafka offset commits.
-- Tenant-filtered lexical search with one bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection.
+- Tenant-filtered lexical search with bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection on every page.
+- Stable PIT/search-after pagination through refreshes and alias handoffs, with signed short-lived cursors, cancellation and bounded resource admission. Cursors are process-local, not HA state. See the [pagination guide](docs/PAGINATION.md).
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
 - Coordinated rebuild with topic-identity/retention checks, source-validated Kafka catch-up, durable indexing pause and atomic alias handoff. Interrupted switches reconcile forward; unsafe rollback is refused.
-- 100 passing tests, including actual database/broker/index integration, delayed consumer acknowledgements, interrupted handoff recovery, corruption rejection, packaged operator commands and index-outage HTTP 503 behavior. See [handoff evidence](docs/validation/P3c2b.md) and [search evidence](docs/validation/P3c1.md).
+- 110 passing tests, including actual database/broker/index integration, delayed consumer acknowledgements, interrupted handoff recovery, stable pagination through source/index changes, packaged HTTP/operator commands and outage recovery. See [pagination evidence](docs/validation/P3c3.md) and [handoff evidence](docs/validation/P3c2b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
 ## Next phases — not yet implemented
 
-Stable pagination, merchant feed jobs and a React investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
+Durable merchant feed jobs and a React investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
 
-Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. Search is currently top-N, without stable pagination. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
+Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
 
 ## Engineering documents
 

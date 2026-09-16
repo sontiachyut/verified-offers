@@ -24,9 +24,11 @@ authoritatively verified search; see [search evidence](validation/P3c1.md).
 P3c2a now provides a resumable, validated shadow snapshot with no live alias
 changes; see [rebuild evidence](validation/P3c2a.md). P3c2b now adds bounded Kafka
 catch-up and a coordinated, recoverable alias switch with an indexing pause;
-see [handoff evidence](validation/P3c2b.md). Stable PIT pagination is the next
-search gate; P3 remains open. Audited index-quarantine replay/retention also
-remains open before the wider operational story is complete.
+see [handoff evidence](validation/P3c2b.md). P3c3 now adds bounded stable PIT pages
+with current source verification; see [pagination evidence](validation/P3c3.md).
+The local P3 functional gate is complete. P4a durable merchant feed jobs are next,
+followed by P4b search/investigation UI. Audited index-quarantine replay/retention
+remains an explicit open operational gate, along with the wider P5/P6 work.
 
 P3 is split into acceptance slices: P3a database-backed relay and failure recovery
 ([ADR 0003](adr/0003-outbox-delivery.md)); P3b actual Kafka delivery; P3c OpenSearch

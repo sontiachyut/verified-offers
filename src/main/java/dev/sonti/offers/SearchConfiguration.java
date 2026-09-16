@@ -20,4 +20,14 @@ class SearchConfiguration {
     @Bean OfferSearch offerSearch(OpenSearchIndex index, OfferCatalog catalog, Clock clock) {
         return new OfferSearch(index::candidates, catalog, clock);
     }
+    @Bean(destroyMethod = "close")
+    SearchPages searchPages(OpenSearchIndex index, OfferSearch verifier, Clock clock, JsonMapper json) {
+        return new SearchPages(new SearchPages.Source() {
+            public String open() { return index.openPointInTime(); }
+            public java.util.List<OpenSearchIndex.Hit> read(String pit, String tenant, String query, int count, java.util.List<Object> after) {
+                return index.page(pit, tenant, query, count, after);
+            }
+            public void close(java.util.List<String> pits) { index.closePointsInTime(pits); }
+        }, verifier, clock, json);
+    }
 }
