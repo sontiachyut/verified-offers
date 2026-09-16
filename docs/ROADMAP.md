@@ -21,7 +21,9 @@ See [validation](validation/P3a.md). P3b is now implemented and tested with
 real broker acknowledgement, outage/recovery, replay and packaged API shutdown;
 see [Kafka validation](validation/P3b.md). P3c1 now adds tested indexing and
 authoritatively verified search; see [search evidence](validation/P3c1.md).
-P3c2 online rebuild/catch-up/alias-switch acceptance remains next; P3 stays open.
+P3c2a now provides a resumable, validated shadow snapshot with no live alias
+changes; see [rebuild evidence](validation/P3c2a.md). P3c2b Kafka boundary,
+catch-up and fenced alias-switch acceptance remains next; P3 stays open.
 
 P3 is split into acceptance slices: P3a database-backed relay and failure recovery
 ([ADR 0003](adr/0003-outbox-delivery.md)); P3b actual Kafka delivery; P3c OpenSearch

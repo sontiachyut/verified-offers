@@ -46,7 +46,8 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Opt-in background publishing to Kafka, with bounded I/O, graceful shutdown and per-result counters.
 - Replay-safe OpenSearch indexing with external versions, retained tombstones, durable poison-event quarantine and manual Kafka offset commits.
 - Tenant-filtered lexical search with one bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection.
-- 70 passing tests, including actual database/broker/index integration, crash-gap replay and index-outage HTTP 503 behavior. See [search evidence](docs/validation/P3c1.md) and [Kafka evidence](docs/validation/P3b.md).
+- A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
+- 81 passing tests, including actual database/broker/index integration, rebuild crash recovery, corruption rejection and index-outage HTTP 503 behavior. See [rebuild evidence](docs/validation/P3c2a.md) and [search evidence](docs/validation/P3c1.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 

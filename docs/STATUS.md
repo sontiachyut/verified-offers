@@ -1,6 +1,6 @@
 # Current status
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 ## Completed
 
@@ -12,16 +12,19 @@ Last updated: 2026-09-15
 - Opt-in Compose broker and [Kafka runbook](KAFKA.md) exercised end to end: API ingest → Kafka console consumption → PostgreSQL publication record, using an isolated synthetic Compose project. Three partitions, seven-day retention and loopback port bindings verified.
 - P3c1: OpenSearch 3.8.0 external-version projection, retained tombstones, explicit write alias, Kafka indexing worker and durable poison quarantine. Top-N lexical search rechecks an authoritative PostgreSQL batch and fails closed on stale facts or index outages. See [ADR 0004](adr/0004-search-projection.md).
 - The opt-in Compose search profile and [walkthrough](SEARCH.md) were exercised on an isolated synthetic stack: verified version 1, disabled indexer plus price-change rejection, same-group restart/catch-up to version 2, immediate authoritative deletion rejection, and three graceful API shutdowns.
-- 36 unit/HTTP/helper plus 34 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (70 total). The HTTP demo also passes. See [search evidence](validation/P3c1.md), [P3b evidence](validation/P3b.md) and historical [P3a evidence](validation/P3a.md).
+- P3c2a core: durable PostgreSQL snapshot references, bounded/leased shadow rebuilding, crash-safe replay, write-blocked full-content/version/count validation. The live alias is untouched. See [ADR 0005](adr/0005-resumable-shadow-rebuild.md) and [evidence](validation/P3c2a.md).
+- 36 unit/HTTP/helper plus 45 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (81 total). See [rebuild evidence](validation/P3c2a.md), [search evidence](validation/P3c1.md) and [P3b evidence](validation/P3b.md).
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: P3c2 online rebuild
+## Exact next task: operator command, then P3c2b catch-up/cutover
 
-Rebuild authoritative PostgreSQL heads (including tombstones) into a new index,
-capture and replay a bounded Kafka catch-up range, validate completeness and
-versions, then atomically switch the write/search alias. Test concurrent updates,
-deletions, interrupted rebuild and rollback. Keep P3 open until this gate passes.
+Expose the tested shadow engine through a guarded one-shot create/step/status
+command and validate the packaged process. Then capture Kafka topic identity and
+start offsets BEFORE a new snapshot, replay a bounded catch-up range, fence live
+indexer writes/commits, validate and atomically switch the write/search alias.
+Existing snapshot-only jobs are never promotable. Test concurrent updates,
+deletions, retention gaps, interrupted cutover and rollback. P3 stays open.
 PIT pagination and audited index-quarantine replay/retention also remain open.
 
 ## Explicit limits / open decisions
@@ -31,4 +34,5 @@ PIT pagination and audited index-quarantine replay/retention also remain open.
 - Images require security remediation/review: see [database scan](validation/IMAGE-SECURITY.md), [Kafka scan](validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch scan](validation/OPENSEARCH-IMAGE-SECURITY.md). Re-scan, production database roles, auth, restore drills and cloud sizing/cost remain deployment gates.
 - Correctness tests are not throughput, uptime, failover or representative scale measurements.
 - No billable cloud resources were created. The seven-session sprint is a planning aid, not a completeness promise.
-- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003/0004.
+- Shadow snapshots are capped at 100,000 offers and ten retained jobs; cleanup/retention is not implemented. SNAPSHOT_VALIDATED is not a promotion approval.
+- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0005.

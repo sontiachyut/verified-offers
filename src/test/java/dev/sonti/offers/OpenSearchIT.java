@@ -32,13 +32,7 @@ import tools.jackson.databind.json.JsonMapper;
 import static org.assertj.core.api.Assertions.*;
 
 class OpenSearchIT extends PostgresFixture {
-    static final GenericContainer<?> search = new GenericContainer<>(DockerImageName.parse(
-            "opensearchproject/opensearch@sha256:bcc1797519726ceb6d651d4a3e60b7c30da91793914a8dfe75fd441d4f641509"))
-            .withEnv("discovery.type", "single-node").withEnv("DISABLE_SECURITY_PLUGIN", "true")
-            .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true").withEnv("OPENSEARCH_JAVA_OPTS", "-Xms512m -Xmx512m")
-            .withExposedPorts(9200).withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withPortBindings(
-                    new PortBinding(Ports.Binding.bindIpAndPort("127.0.0.1", 0), new ExposedPort(9200))))
-            .waitingFor(Wait.forHttp("/").forPort(9200).withStartupTimeout(Duration.ofMinutes(2)));
+    static final GenericContainer<?> search = SearchTestContainer.create();
     static final KafkaContainer broker = new KafkaContainer(DockerImageName.parse(
             "apache/kafka@sha256:9916d60eca5d599550e2c320230808fda342124ba550bb4ac4ea8591803262a0").asCompatibleSubstituteFor("apache/kafka"))
             .withEnv("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "false").withEnv("KAFKA_HEAP_OPTS", "-Xms256m -Xmx512m")

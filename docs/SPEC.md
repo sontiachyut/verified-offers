@@ -7,6 +7,9 @@ Primary question: can a shopper trust the price and availability presented by a 
 P3c clarification: ADR 0004 defines fail-closed top-N search, external-version
 consumer idempotence and poison quarantine; online rebuild and PIT pagination
 remain separate gates.
+P3c2a clarification: ADR 0005 defines durable snapshot capture, resumable shadow
+projection and full validation. Snapshot validation never authorizes promotion;
+Kafka catch-up and fenced alias switching remain P3c2b acceptance work.
 
 ## Product and boundaries
 
