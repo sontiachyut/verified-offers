@@ -22,7 +22,8 @@ not delete an existing index to make it pass. Reuse the existing alias and group
 on normal restarts. An index and its consumer group form a pair: do not reuse a
 caught-up group's offsets with a new empty index. Kafka retains seven days, so
 starting a fresh group is **not** a complete database rebuild. The online rebuild
-workflow is P3c2 work, not implemented yet.
+workflow is P3c2b work, not implemented yet. The [snapshot rebuild command](REBUILD.md)
+can now build and validate a separate read-only shadow, but cannot promote it.
 
 Start the packaged API with the database environment from KAFKA.md still set:
 

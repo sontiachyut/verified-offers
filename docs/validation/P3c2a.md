@@ -9,6 +9,11 @@ existing digest-pinned PostgreSQL 17.11, Kafka 4.2.1 and OpenSearch 3.8.0 images
 No new image or dependency was introduced. Existing scan findings still block
 public deployment; correctness tests are not security or capacity certification.
 
+Final operator/bulk-response gate: the same full command passed **86 tests**
+(39 unit/HTTP/helper + 47 integration), zero failures/errors/skips. The core
+commit `df6b411` also passed GitHub Actions; check the exact final operator commit
+separately rather than treating this historical result as its CI outcome.
+
 ## Evidence
 
 - Durable snapshot references preserve exact original versions and tombstones
@@ -33,6 +38,20 @@ public deployment; correctness tests are not security or capacity certification.
   serves its original document throughout shadow construction/validation.
 - Validated shadows remain write-blocked. Empty snapshots validate correctly.
   Terminal jobs do not restart or perform an alias switch.
+- Packaged operator JVMs create a snapshot, resume one page per process, reach
+  SNAPSHOT_VALIDATED and read status, then exit without forced termination.
+  Inherited publisher/indexer/search flags are deliberately true; the operator
+  overrides them, starts no web server and leaves outbox records unpublished.
+  Unsafe/remote arguments and an oversized snapshot exit nonzero without jobs.
+- A controlled HTTP bulk response reports one success and one item error: the
+  adapter rejects the batch rather than trusting HTTP 200. Equal-version replay
+  conflicts are accepted; unrelated conflicts are rejected without leaking the
+  fixture's error detail.
+
+The existing four-assertion HTTP reference demo also passes. No independent
+manual Compose rebuild walkthrough is claimed; the documented create/step/status
+sequence is exercised by packaged-process integration tests against actual
+PostgreSQL and OpenSearch containers.
 
 ## Boundaries
 

@@ -34,6 +34,10 @@ It covers explicit alias provisioning, verified results, pausing/resuming the
 indexer and graceful shutdown. The separate Compose `search` profile keeps the
 index off unless requested.
 
+The [shadow-rebuild runbook](docs/REBUILD.md) adds one-shot create/step/status
+commands with durable progress and full validation. It leaves the live index
+untouched; Kafka catch-up and promotion are not implemented yet.
+
 Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full acceptance gate.
 
 ## What works today
@@ -47,7 +51,7 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Replay-safe OpenSearch indexing with external versions, retained tombstones, durable poison-event quarantine and manual Kafka offset commits.
 - Tenant-filtered lexical search with one bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection.
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
-- 81 passing tests, including actual database/broker/index integration, rebuild crash recovery, corruption rejection and index-outage HTTP 503 behavior. See [rebuild evidence](docs/validation/P3c2a.md) and [search evidence](docs/validation/P3c1.md).
+- 86 passing tests, including actual database/broker/index integration, rebuild crash recovery, corruption rejection, packaged operator commands and index-outage HTTP 503 behavior. See [rebuild evidence](docs/validation/P3c2a.md) and [search evidence](docs/validation/P3c1.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 

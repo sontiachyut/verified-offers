@@ -41,4 +41,37 @@ class OpenSearchIndexTest {
             assertThatThrownBy(() -> index.project(offer)).isInstanceOf(DomainException.class);
         } finally { server.stop(0); }
     }
+
+    @Test void shadowBulkChecksEveryItemAndAcceptsOnlyVersionConflictReplays() throws Exception {
+        var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        var body = new java.util.concurrent.atomic.AtomicReference<>("{}");
+        server.createContext("/", exchange -> {
+            exchange.getRequestBody().readAllBytes();
+            byte[] bytes = body.get().getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (var output = exchange.getResponseBody()) { output.write(bytes); }
+        });
+        server.start();
+        try (var index = new OpenSearchIndex("http://127.0.0.1:" + server.getAddress().getPort(),
+                "offers-build-" + java.util.UUID.randomUUID(), json)) {
+            var offers = java.util.List.of(
+                    new Offer("demo", "merchant", "one", 1, "Keyboard", 999, "USD", 4, Instant.now(), false),
+                    new Offer("demo", "merchant", "two", 1, "Keyboard", 999, "USD", 4, Instant.now(), false));
+            body.set("""
+                    {"errors":true,"items":[
+                      {"index":{"_id":"demo:merchant:one","status":201}},
+                      {"index":{"_id":"demo:merchant:two","status":400,"error":{"type":"mapper_parsing_exception","reason":"private-fixture"}}}]}
+                    """);
+            assertThatThrownBy(() -> index.project(offers)).isInstanceOfSatisfying(DomainException.class,
+                    error -> assertThat(error.getMessage()).isEqualTo("Search temporarily unavailable."));
+            body.set("""
+                    {"errors":true,"items":[
+                      {"index":{"_id":"demo:merchant:one","status":409,"error":{"type":"version_conflict_engine_exception"}}},
+                      {"index":{"_id":"demo:merchant:two","status":201}}]}
+                    """);
+            assertThatCode(() -> index.project(offers)).doesNotThrowAnyException();
+            body.set(body.get().replace("version_conflict_engine_exception", "unrelated_conflict"));
+            assertThatThrownBy(() -> index.project(offers)).isInstanceOf(DomainException.class);
+        } finally { server.stop(0); }
+    }
 }

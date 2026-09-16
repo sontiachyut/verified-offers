@@ -107,8 +107,9 @@ stores outbox events. `local-demo` never creates the Kafka publisher.
 `./mvnw verify` runs real Kafka/PostgreSQL integration tests including broker
 pause/recovery, replay after broker acknowledgement and packaged API publishing
 and shutdown. It fails if Docker is unavailable. Tests own separate temporary
-containers and do not use Compose data. The consumer in tests verifies delivery;
-an application index consumer is not implemented yet.
+containers and do not use Compose data. Dedicated delivery tests verify the
+original envelopes. The opt-in application index consumer and authoritative
+search now have their own [walkthrough](SEARCH.md) and integration tests.
 
 The local broker has one replica, plaintext listeners and no authentication. An
 acknowledgement is not proof of resilience to loss of that broker's data volume.

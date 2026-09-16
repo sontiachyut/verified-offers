@@ -157,5 +157,59 @@ class ShadowRebuildIT extends PostgresFixture {
             assertThat(shadow.count()).isZero();
         }
     }
+
+    @Test void packagedOperatorResumesAcrossProcessesWithoutStartingWebOrWorkers() throws Exception {
+        Offer original = catalog.ingest(offer("item", 1, false));
+        var created = command(0, "--rebuild=create", "--max-offers=10");
+        UUID id = UUID.fromString(created.path("job").path("id").asString());
+        assertThat(created.path("promotable").asBoolean()).isFalse();
+        catalog.ingest(offer("item", 2, true));
+        assertThat(command(0, "--rebuild=step", "--job=" + id, "--endpoint=" + endpoint())
+                .path("job").path("state").asString()).isEqualTo("VALIDATING");
+        assertThat(command(0, "--rebuild=step", "--job=" + id, "--endpoint=" + endpoint())
+                .path("job").path("validated").asLong()).isEqualTo(1);
+        assertThat(command(0, "--rebuild=step", "--job=" + id, "--endpoint=" + endpoint())
+                .path("result").asString()).isEqualTo("SNAPSHOT_VALIDATED");
+        assertThat(command(0, "--rebuild=status", "--job=" + id).path("job").path("state").asString())
+                .isEqualTo("SNAPSHOT_VALIDATED");
+        try (var shadow = index(store.get(id))) { assertThat(shadow.matches(List.of(original))).isTrue(); }
+        assertThat(sql.queryForObject("SELECT count(*) FROM outbox WHERE published_at IS NOT NULL", Integer.class)).isZero();
+    }
+    @Test void packagedOperatorRejectsUnsafeOptionsAndOversizeCapture() throws Exception {
+        catalog.ingest(offer("one", 1, false));
+        catalog.ingest(offer("two", 1, false));
+        command(2, "--rebuild=create", "--max-offers=1");
+        command(2, "--rebuild=create", "--offers.publisher.enabled=true");
+        command(2, "--rebuild=step", "--job=" + UUID.randomUUID(), "--endpoint=http://example.com:9200");
+        assertThat(sql.queryForObject("SELECT count(*) FROM index_rebuild", Integer.class)).isZero();
+        assertThat(sql.queryForObject("SELECT count(*) FROM offer_head", Integer.class)).isEqualTo(2);
+    }
+    private JsonNode command(int expectedExit, String... args) throws Exception {
+        var command = new java.util.ArrayList<>(List.of(System.getProperty("java.home") + "/bin/java", "-jar",
+                "target/verified-offers-0.1.0-SNAPSHOT.jar"));
+        command.addAll(List.of(args));
+        var builder = new ProcessBuilder(command).redirectErrorStream(true);
+        builder.environment().put("APP_DATABASE_URL", postgres.getJdbcUrl());
+        builder.environment().put("APP_DATABASE_USER", postgres.getUsername());
+        builder.environment().put("APP_DATABASE_PASSWORD", postgres.getPassword());
+        // Forced operator settings must override inherited flags, even without Kafka configuration.
+        builder.environment().put("OFFERS_PUBLISHER_ENABLED", "true");
+        builder.environment().put("OFFERS_INDEXER_ENABLED", "true");
+        builder.environment().put("OFFERS_SEARCH_ENABLED", "true");
+        var process = builder.start();
+        try {
+            assertThat(process.waitFor(25, java.util.concurrent.TimeUnit.SECONDS)).as("one-shot process exits itself").isTrue();
+            String output = new String(process.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            assertThat(process.exitValue()).as(output).isEqualTo(expectedExit);
+            assertThat(output).doesNotContain("Tomcat", "Kafka version:", "Exception:");
+            if (expectedExit != 0) {
+                assertThat(output).contains("Rebuild command failed.");
+                return json.readTree("{}");
+            }
+            return output.lines().filter(line -> line.startsWith("{")).map(json::readTree).findFirst().orElseThrow();
+        } finally {
+            if (process.isAlive()) { process.destroyForcibly(); process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS); }
+        }
+    }
     private static final class SimulatedCrash extends Error {}
 }

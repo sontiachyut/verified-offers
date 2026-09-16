@@ -13,15 +13,15 @@ Last updated: 2026-09-16
 - P3c1: OpenSearch 3.8.0 external-version projection, retained tombstones, explicit write alias, Kafka indexing worker and durable poison quarantine. Top-N lexical search rechecks an authoritative PostgreSQL batch and fails closed on stale facts or index outages. See [ADR 0004](adr/0004-search-projection.md).
 - The opt-in Compose search profile and [walkthrough](SEARCH.md) were exercised on an isolated synthetic stack: verified version 1, disabled indexer plus price-change rejection, same-group restart/catch-up to version 2, immediate authoritative deletion rejection, and three graceful API shutdowns.
 - P3c2a core: durable PostgreSQL snapshot references, bounded/leased shadow rebuilding, crash-safe replay, write-blocked full-content/version/count validation. The live alias is untouched. See [ADR 0005](adr/0005-resumable-shadow-rebuild.md) and [evidence](validation/P3c2a.md).
-- 36 unit/HTTP/helper plus 45 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (81 total). See [rebuild evidence](validation/P3c2a.md), [search evidence](validation/P3c1.md) and [P3b evidence](validation/P3b.md).
+- Packaged one-shot rebuild create/step/status commands resume across JVM processes and force web/publisher/indexer/search off, even when inherited flags enable them. See the [operator runbook](REBUILD.md). No promotion or cleanup command is exposed.
+- 39 unit/HTTP/helper plus 47 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (86 total). The four-assertion HTTP demo also passes. See [rebuild evidence](validation/P3c2a.md), [search evidence](validation/P3c1.md) and [P3b evidence](validation/P3b.md).
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: operator command, then P3c2b catch-up/cutover
+## Exact next task: P3c2b catch-up/cutover
 
-Expose the tested shadow engine through a guarded one-shot create/step/status
-command and validate the packaged process. Then capture Kafka topic identity and
-start offsets BEFORE a new snapshot, replay a bounded catch-up range, fence live
+Capture Kafka topic identity and start offsets BEFORE a new snapshot,
+replay a bounded catch-up range, fence live
 indexer writes/commits, validate and atomically switch the write/search alias.
 Existing snapshot-only jobs are never promotable. Test concurrent updates,
 deletions, retention gaps, interrupted cutover and rollback. P3 stays open.
