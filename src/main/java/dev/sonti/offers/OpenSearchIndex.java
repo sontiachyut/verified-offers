@@ -106,6 +106,53 @@ public final class OpenSearchIndex implements AutoCloseable, ShadowRebuild.Targe
         return List.copyOf(offers);
     }
 
+    record Hit(Offer offer, List<Object> sort) {}
+
+    String openPointInTime() {
+        var response = request("POST", "/" + index + "/_search/point_in_time?keep_alive=2m&allow_partial_pit_creation=false", Map.of(), false);
+        String id = response.path("pit_id").asString();
+        if (id == null || id.isBlank() || id.length() > 16384 || response.path("_shards").path("failed").asInt() != 0) throw unavailable();
+        return id;
+    }
+
+    List<Hit> page(String pit, String tenant, String query, int count, List<Object> after) {
+        Input.identifier(tenant);
+        if (pit == null || pit.isBlank() || pit.length() > 16384 || query == null || query.isBlank()
+                || query.length() > 200 || count < 1 || count > 250 || (after != null && after.size() != 3)) {
+            throw new IllegalArgumentException("Invalid PIT search bounds.");
+        }
+        var body = new java.util.LinkedHashMap<String, Object>();
+        body.put("size", count); body.put("track_total_hits", false); body.put("timeout", "2s");
+        body.put("pit", Map.of("id", pit)); // Never renew: abandoned contexts have a fixed resource lifetime.
+        body.put("sort", List.of(Map.of("_score", "desc"), Map.of("merchantId", "asc"), Map.of("offerId", "asc")));
+        body.put("query", Map.of("bool", Map.of("must", List.of(Map.of("match", Map.of("title", query))),
+                "filter", List.of(Map.of("term", Map.of("tenantId", tenant)), Map.of("term", Map.of("deleted", false))))));
+        if (after != null) body.put("search_after", after);
+        var response = request("POST", "/_search?allow_partial_search_results=false", body, false);
+        if (response.path("timed_out").asBoolean() || response.path("_shards").path("failed").asInt() != 0
+                || !response.path("hits").path("hits").isArray()) throw unavailable();
+        var hits = new ArrayList<Hit>();
+        for (var hit : response.path("hits").path("hits")) {
+            try {
+                Offer offer = json.treeToValue(hit.get("_source"), Offer.class);
+                var sort = hit.path("sort");
+                if (offer == null || !tenant.equals(offer.tenantId()) || hits.size() >= count || !sort.isArray()
+                        || sort.size() != 3 || !sort.get(0).isNumber() || !Double.isFinite(sort.get(0).asDouble())
+                        || !offer.merchantId().equals(sort.get(1).asString()) || !offer.offerId().equals(sort.get(2).asString())) throw unavailable();
+                hits.add(new Hit(offer, List.of(sort.get(0).asDouble(), offer.merchantId(), offer.offerId())));
+            } catch (RuntimeException invalid) { throw unavailable(); }
+        }
+        return List.copyOf(hits);
+    }
+
+    void closePointsInTime(List<String> ids) {
+        if (ids.isEmpty()) return;
+        if (ids.size() > 128 || ids.stream().anyMatch(id -> id == null || id.isBlank() || id.length() > 16384)) {
+            throw new IllegalArgumentException("Invalid PIT close bounds.");
+        }
+        request("DELETE", "/_search/point_in_time", Map.of("pit_id", ids), false);
+    }
+
     void refresh() { request("POST", "/" + index + "/_refresh", Map.of(), false); }
 
     @Override public void ensure(UUID job) {

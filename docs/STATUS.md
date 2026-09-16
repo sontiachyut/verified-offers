@@ -22,6 +22,14 @@ Last updated: 2026-09-16
 
 ## Exact next task: stable search pagination
 
+In progress: [ADR 0007](adr/0007-stable-search-pages.md) defines the contract.
+The first slice adds PIT creation, deterministic search-after ordering and
+bounded PIT deletion to the adapter, with real-index alias/refresh tests.
+Adapter acceptance: full `./mvnw verify` passed 101 tests (43 unit, 58 integration),
+zero failures/errors/skips, on 2026-09-16. The test observes stable six-offer
+PIT ordering despite new documents, updated/deleted sources and alias replacement.
+The public API still rejects cursors until the session/verification layer lands.
+
 Define the PIT/search-after cursor contract before implementation: bounded
 lifetime/resource use, query/tenant binding, deterministic ordering, fail-closed
 expiry/error behavior and authoritative rechecks on every page. Test concurrent

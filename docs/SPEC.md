@@ -13,6 +13,8 @@ Kafka catch-up and alias switching are handled only by new coordinated runs.
 P3c2b clarification: ADR 0006 specifies a bounded replay window and durable indexing
 pause, a separately validated candidate, and recoverable atomic alias handoff.
 The bounded local handoff gate is implemented; stable PIT pagination remains open.
+P3c3 design: ADR 0007 defines bounded PIT/search-after pages, process-local signed
+cursors and authoritative verification on every page. Implementation is incremental.
 
 ## Product and boundaries
 
