@@ -21,9 +21,10 @@ The index-creation command intentionally fails if the index already exists; do
 not delete an existing index to make it pass. Reuse the existing alias and group
 on normal restarts. An index and its consumer group form a pair: do not reuse a
 caught-up group's offsets with a new empty index. Kafka retains seven days, so
-starting a fresh group is **not** a complete database rebuild. The online rebuild
-workflow is P3c2b work, not implemented yet. The [snapshot rebuild command](REBUILD.md)
-can now build and validate a separate read-only shadow, but cannot promote it.
+starting a fresh group is **not** a complete database rebuild. Use the
+[coordinated handoff](HANDOFF.md) for bounded Kafka catch-up and a recoverable
+alias switch with an indexing pause. The separate [snapshot command](REBUILD.md)
+only builds a validated read-only shadow and cannot promote it.
 
 Start the packaged API with the database environment from KAFKA.md still set:
 

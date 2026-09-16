@@ -12,8 +12,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 final class IndexRecordHandler {
     private final Consumer<Offer> projection;
     private final JdbcTemplate sql;
-    IndexRecordHandler(Consumer<Offer> projection, JdbcTemplate sql) { this.projection = projection; this.sql = sql; }
+    private final Runnable gate;
+    IndexRecordHandler(Consumer<Offer> projection, JdbcTemplate sql) { this(projection, sql, () -> {}); }
+    IndexRecordHandler(Consumer<Offer> projection, JdbcTemplate sql, Runnable gate) {
+        this.projection = projection; this.sql = sql; this.gate = gate;
+    }
     String handle(ConsumerRecord<String, String> record) {
+        gate.run();
         Offer offer;
         try { offer = OfferEvent.parse(record.key(), record.value()); }
         catch (IllegalArgumentException invalid) {

@@ -44,6 +44,39 @@ public final class OpenSearchIndex implements AutoCloseable, ShadowRebuild.Targe
         } catch (java.io.IOException failed) { throw new IllegalStateException("Cannot load index mapping.", failed); }
     }
 
+    String alias() { return index; }
+
+    String liveTarget() {
+        var aliases = request("GET", "/_alias/" + index, null, false);
+        if (aliases.size() != 1) throw new DomainException(409, "Live alias must resolve to one write index.");
+        var entry = aliases.properties().iterator().next();
+        var definition = entry.getValue().path("aliases").path(index);
+        if (definition.size() != 1 || !definition.path("is_write_index").asBoolean()) {
+            throw new DomainException(409, "Filtered or implicit write aliases are not supported.");
+        }
+        return entry.getKey();
+    }
+
+    void promote(String expectedOld, OpenSearchIndex candidate, UUID candidateId) {
+        if (!candidate.alias().equals("offers-build-" + candidateId) || !endpoint.equals(candidate.endpoint)
+                || expectedOld == null || !expectedOld.matches("[a-z][a-z0-9-]{0,254}")) {
+            throw new IllegalArgumentException("Invalid handoff target.");
+        }
+        String target = candidate.alias() + "-v1";
+        String current = liveTarget();
+        if (!current.equals(expectedOld) && !current.equals(target)) throw new DomainException(409, "Live alias changed.");
+        if (current.equals(expectedOld)) candidate.ensure(candidateId);
+        var unblocked = candidate.request("PUT", "/" + target + "/_settings", Map.of("index.blocks.write", false), false);
+        if (!unblocked.path("acknowledged").asBoolean()) throw unavailable();
+        if (current.equals(expectedOld)) {
+            var reply = request("POST", "/_aliases", Map.of("actions", List.of(
+                    Map.of("remove", Map.of("index", expectedOld, "alias", index, "must_exist", true)),
+                    Map.of("add", Map.of("index", target, "alias", index, "is_write_index", true)))), false);
+            if (!reply.path("acknowledged").asBoolean()) throw unavailable();
+        }
+        if (!target.equals(liveTarget())) throw unavailable();
+    }
+
     public boolean project(Offer offer) {
         String key = offer.tenantId() + ":" + offer.merchantId() + ":" + offer.offerId();
         return request("PUT", "/" + index + "/_doc/" + key + "?version=" + offer.version()
@@ -165,7 +198,7 @@ public final class OpenSearchIndex implements AutoCloseable, ShadowRebuild.Targe
     private static String key(Offer offer) { return offer.tenantId() + ":" + offer.merchantId() + ":" + offer.offerId(); }
 
     private JsonNode request(String method, String path, Object body, boolean versionConflictAllowed) {
-        Reply response = send(method, path, json.writeValueAsString(body), "application/json");
+        Reply response = send(method, path, body == null ? null : json.writeValueAsString(body), "application/json");
         var parsed = response.body();
         if (response.status() == 409 && versionConflictAllowed
                 && "version_conflict_engine_exception".equals(parsed.path("error").path("type").asString())) return null;

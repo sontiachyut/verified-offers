@@ -34,9 +34,10 @@ It covers explicit alias provisioning, verified results, pausing/resuming the
 indexer and graceful shutdown. The separate Compose `search` profile keeps the
 index off unless requested.
 
-The [shadow-rebuild runbook](docs/REBUILD.md) adds one-shot create/step/status
-commands with durable progress and full validation. It leaves the live index
-untouched; Kafka catch-up and promotion are not implemented yet.
+The [shadow-rebuild runbook](docs/REBUILD.md) provides snapshot-only commands.
+The [coordinated handoff runbook](docs/HANDOFF.md) adds bounded Kafka catch-up,
+full candidate validation and recoverable alias switching. It explicitly pauses
+indexing during the handoff; it is not a zero-downtime claim.
 
 Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full acceptance gate.
 
@@ -51,15 +52,16 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Replay-safe OpenSearch indexing with external versions, retained tombstones, durable poison-event quarantine and manual Kafka offset commits.
 - Tenant-filtered lexical search with one bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection.
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
-- 86 passing tests, including actual database/broker/index integration, rebuild crash recovery, corruption rejection, packaged operator commands and index-outage HTTP 503 behavior. See [rebuild evidence](docs/validation/P3c2a.md) and [search evidence](docs/validation/P3c1.md).
+- Coordinated rebuild with topic-identity/retention checks, source-validated Kafka catch-up, durable indexing pause and atomic alias handoff. Interrupted switches reconcile forward; unsafe rollback is refused.
+- 100 passing tests, including actual database/broker/index integration, delayed consumer acknowledgements, interrupted handoff recovery, corruption rejection, packaged operator commands and index-outage HTTP 503 behavior. See [handoff evidence](docs/validation/P3c2b.md) and [search evidence](docs/validation/P3c1.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
 ## Next phases — not yet implemented
 
-Online index rebuild/catch-up/alias switching, stable pagination, merchant feed jobs and a React investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
+Stable pagination, merchant feed jobs and a React investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
 
-Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. P3c1 delivers top-N search, not the full P3 rebuild gate. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
+Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. Search is currently top-N, without stable pagination. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
 
 ## Engineering documents
 

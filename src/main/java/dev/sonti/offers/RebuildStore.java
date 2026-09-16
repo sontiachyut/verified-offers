@@ -37,6 +37,10 @@ final class RebuildStore {
     }
 
     Job create() {
+        return capture(null);
+    }
+    Job createCandidate(UUID runId) { return capture(runId); }
+    private Job capture(UUID runId) {
         return tx.execute(status -> {
             // Serialize only job creation, so simultaneous creators cannot exceed the disk budget.
             sql.execute("SELECT pg_advisory_xact_lock(781349,1)");
@@ -45,17 +49,22 @@ final class RebuildStore {
             }
             UUID id = UUID.randomUUID();
             sql.update("INSERT INTO index_rebuild(job_id) VALUES (?)", id);
+            String source = runId == null ? "offer_head" : "(SELECT tenant_id,merchant_id,offer_id,version FROM index_online_expected WHERE run_id=?) expected";
+            var arguments = new java.util.ArrayList<Object>();
+            arguments.add(id);
+            if (runId != null) arguments.add(runId);
+            arguments.add(snapshotLimit + 1); arguments.add(id);
             long count = sql.queryForObject("""
                     WITH captured AS (
                         INSERT INTO index_rebuild_item(job_id,ordinal,tenant_id,merchant_id,offer_id,version)
                         SELECT ?,row_number() OVER (ORDER BY tenant_id,merchant_id,offer_id),
                                tenant_id,merchant_id,offer_id,version
-                        FROM offer_head ORDER BY tenant_id,merchant_id,offer_id LIMIT ?
+                        FROM %s ORDER BY tenant_id,merchant_id,offer_id LIMIT ?
                         RETURNING ordinal
                     ), marked AS (
                         UPDATE index_rebuild SET snapshot_at=statement_timestamp() WHERE job_id=? RETURNING job_id
                     ) SELECT count(*) FROM captured
-                    """, Long.class, id, snapshotLimit + 1, id);
+                    """.formatted(source), Long.class, arguments.toArray());
             if (count > snapshotLimit) throw new DomainException(409, "Configured local snapshot cap exceeded.");
             sql.update("UPDATE index_rebuild SET total=? WHERE job_id=?", count, id);
             return get(id);

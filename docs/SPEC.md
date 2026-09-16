@@ -9,7 +9,10 @@ consumer idempotence and poison quarantine; online rebuild and PIT pagination
 remain separate gates.
 P3c2a clarification: ADR 0005 defines durable snapshot capture, resumable shadow
 projection and full validation. Snapshot validation never authorizes promotion;
-Kafka catch-up and fenced alias switching remain P3c2b acceptance work.
+Kafka catch-up and alias switching are handled only by new coordinated runs.
+P3c2b clarification: ADR 0006 specifies a bounded replay window and durable indexing
+pause, a separately validated candidate, and recoverable atomic alias handoff.
+The bounded local handoff gate is implemented; stable PIT pagination remains open.
 
 ## Product and boundaries
 

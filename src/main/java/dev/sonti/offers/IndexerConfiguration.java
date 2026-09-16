@@ -15,6 +15,7 @@ class IndexerConfiguration {
     @Bean(initMethod = "start", destroyMethod = "close")
     IndexConsumer offerIndexConsumer(@Value("${offers.indexer.bootstrap-servers}") String servers,
             @Value("${offers.indexer.group}") String group, OpenSearchIndex index, JdbcTemplate sql, MeterRegistry meters) {
-        return new IndexConsumer(servers, group, new IndexRecordHandler(index::project, sql), meters);
+        return new IndexConsumer(servers, group,
+                new IndexRecordHandler(index::project, sql, new IndexingGate(sql, index.alias())), meters);
     }
 }

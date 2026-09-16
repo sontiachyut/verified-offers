@@ -5,6 +5,9 @@ and validate it. **It does not catch up Kafka or switch the live index.** Even
 `SNAPSHOT_VALIDATED` is not a promotion approval. Ingestion can continue, so the
 snapshot may already differ from current source facts.
 
+For a **new coordinated run** with Kafka catch-up and alias handoff, use
+[HANDOFF.md](HANDOFF.md). Existing snapshot-only jobs cannot be promoted by it.
+
 Use synthetic data only. Existing pinned-image vulnerabilities, authentication
 and deployment gates still apply. This is a local operator command, not a public
 API. All steps are explicit one-shot processes; nothing is scheduled afterward.
@@ -105,11 +108,11 @@ this command cannot provide availability guarantees.
 
 ## What is deliberately absent
 
-No catch-up, promotion, rollback or cleanup command exists yet. Do not manually
-unblock or promote these snapshots. A safe future online run must capture Kafka
-boundaries before snapshot creation, handle topic/retention/partition changes,
-replay missed updates, fence the live indexer handoff, and reconcile interrupted
-alias changes. An atomic alias API call alone does not establish those properties.
+These snapshot-only commands expose no catch-up, promotion, rollback or cleanup.
+Do not manually unblock or promote their snapshots. The separate
+[coordinated handoff](HANDOFF.md) captures Kafka boundaries before a new snapshot,
+handles replay and pauses the indexer before a recoverable alias switch. An
+atomic alias API call alone does not establish those properties.
 
 See [ADR 0005](adr/0005-resumable-shadow-rebuild.md) and
 [validation evidence](validation/P3c2a.md). Stop local dependencies when finished
