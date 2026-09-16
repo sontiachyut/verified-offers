@@ -23,6 +23,11 @@ Last updated: 2026-09-16
 
 ## Exact next task: P4a merchant feed jobs
 
+P4a contract recorded in [ADR 0008](adr/0008-durable-merchant-feeds.md): bounded
+NDJSON, checksum/idempotency, immutable provenance, atomic per-row receipts,
+lease/retry/cancel behavior and full acceptance requirements. Implementation
+is in progress; no feed feature is claimed complete by this design milestone.
+
 The local P3 functional gate is complete, including rebuild and stable pages.
 Define the bounded feed-upload and durable job contract before implementation:
 input/row limits, checksum/idempotency, source provenance, per-row results,
