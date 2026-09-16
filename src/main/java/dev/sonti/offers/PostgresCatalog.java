@@ -30,8 +30,15 @@ public final class PostgresCatalog implements OfferCatalog {
     }
 
     @Override public Offer ingest(Offer offer) {
+        return tx.execute(status -> ingestInTransaction(offer).offer());
+    }
+
+    record Ingested(Offer offer, boolean replay) {}
+    Ingested ingestInTransaction(Offer offer) {
+        if (!org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
+            throw new IllegalStateException("Catalog ingestion requires an active transaction.");
+        }
         if (offer.sourceUpdatedAt().isAfter(clock.instant())) throw new IllegalArgumentException("Future source timestamp.");
-        return tx.execute(status -> {
             sql.update("INSERT INTO offer_key VALUES (?,?,?) ON CONFLICT DO NOTHING",
                     offer.tenantId(), offer.merchantId(), offer.offerId());
             sql.queryForObject("SELECT offer_id FROM offer_key WHERE tenant_id=? AND merchant_id=? AND offer_id=? FOR UPDATE",
@@ -41,7 +48,7 @@ public final class PostgresCatalog implements OfferCatalog {
                 if (offer.version() < current.version()) throw new DomainException(409, "Stale source version.");
                 if (offer.version() == current.version()) {
                     if (!offer.equals(current)) throw new DomainException(409, "Same version has different facts.");
-                    return current;
+                    return new Ingested(current, true);
                 }
             }
             String payload = json.writeValueAsString(offer);
@@ -67,8 +74,7 @@ public final class PostgresCatalog implements OfferCatalog {
                     "occurredAt", clock.instant(), "correlationId", event, "payload", offer));
             sql.update("INSERT INTO outbox(event_id,event_type,tenant_id,aggregate_id,aggregate_version,payload) VALUES (?,?,?,?,?,?::jsonb)",
                     event, type, offer.tenantId(), aggregate, offer.version(), envelope);
-            return offer;
-        });
+            return new Ingested(offer, false);
     }
 
     @Override public Offer get(String tenantId, String merchantId, String offerId) {
