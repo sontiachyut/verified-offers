@@ -27,6 +27,10 @@ P4a contract recorded in [ADR 0008](adr/0008-durable-merchant-feeds.md): bounded
 NDJSON, checksum/idempotency, immutable provenance, atomic per-row receipts,
 lease/retry/cancel behavior and full acceptance requirements. Implementation
 is in progress; no feed feature is claimed complete by this design milestone.
+Parser slice: bounded UTF-8/NDJSON admission, exact-byte SHA-256, strict schema
+validation and sanitized per-line errors are implemented. `./mvnw test` passes
+54 tests, including five new parser tests; full integration acceptance remains
+pending the durable job engine/API slices.
 
 The local P3 functional gate is complete, including rebuild and stable pages.
 Define the bounded feed-upload and durable job contract before implementation:
