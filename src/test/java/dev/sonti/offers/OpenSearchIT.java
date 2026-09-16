@@ -154,6 +154,35 @@ class OpenSearchIT extends PostgresFixture {
         }
     }
 
+    @Test void merchantFeedReachesKafkaAndVerifiedSearchWithSourceProvenance() throws Exception {
+        String tenant = "feed-" + UUID.randomUUID();
+        try (var app = new RunningApplication("--offers.feeds.enabled=true", "--offers.feeds.worker-enabled=true",
+                "--offers.publisher.enabled=true", "--offers.publisher.bootstrap-servers=" + broker.getBootstrapServers(),
+                "--offers.search.enabled=true", "--offers.search.endpoint=" + endpoint(), "--offers.search.index=" + indexName,
+                "--offers.indexer.enabled=true", "--offers.indexer.bootstrap-servers=" + broker.getBootstrapServers(),
+                "--offers.indexer.group=check-" + UUID.randomUUID())) {
+            Offer offer = offer(tenant, 1, 999, 4, false);
+            byte[] body = (json.writeValueAsString(offer) + "\nnot-json-fixture\n").getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            String feedPath = "/api/v1/feeds/" + tenant + "/merchant";
+            var headers = Map.of("Content-Type", "application/x-ndjson", "Idempotency-Key", "pipeline-1",
+                    "X-Content-SHA256", FeedInput.sha256(body), "X-Feed-Source", "synthetic-catalog");
+            String id = app.rawRequest("POST", feedPath, body, headers, false, 202).path("job").path("id").asString();
+            RunningApplication.awaitReady(() -> true, () -> {
+                index.refresh(); return !index.candidates(tenant, "keyboard", 10).isEmpty();
+            }, Duration.ofSeconds(30));
+            var job = app.request("GET", feedPath + "/" + id, null, 200);
+            assertThat(job.path("state").asString()).isEqualTo("COMPLETED_WITH_ERRORS");
+            assertThat(job.path("applied").asInt()).isEqualTo(1); assertThat(job.path("rejected").asInt()).isEqualTo(1);
+            assertThat(job.path("sha256").asString()).isEqualTo(FeedInput.sha256(body));
+            var result = app.request("GET", "/api/v1/search?tenantId=" + tenant + "&q=keyboard", null, 200).path("results").get(0);
+            assertThat(result.path("verification").path("outcome").asString()).isEqualTo("VERIFIED");
+            assertThat(json.treeToValue(result.path("offer"), Offer.class)).isEqualTo(offer);
+            assertThat(app.rawRequest("POST", feedPath, body, headers, false, 200).path("created").asBoolean()).isFalse();
+            assertThat(sql.queryForObject("SELECT count(*) FROM outbox WHERE tenant_id=? AND published_at IS NOT NULL", Integer.class, tenant)).isEqualTo(1);
+            assertThat(sql.queryForObject("SELECT count(*) FROM feed_row WHERE job_id=? AND receipt_version=1", Integer.class, UUID.fromString(id))).isEqualTo(1);
+        }
+    }
+
     private KafkaConsumer<String, String> consumer(String group, TopicPartition partition, boolean initialize) {
         var consumer = new KafkaConsumer<String, String>(Map.of("bootstrap.servers", broker.getBootstrapServers(),
                 "group.id", group, "key.deserializer", StringDeserializer.class, "value.deserializer", StringDeserializer.class,

@@ -45,7 +45,8 @@ final class RebuildCommand {
             var application = new SpringApplication(Application.class);
             try (var context = application.run("--spring.profiles.active=postgres-local",
                     "--spring.main.web-application-type=none", "--spring.main.banner-mode=off", "--logging.level.root=OFF",
-                    "--offers.publisher.enabled=false", "--offers.indexer.enabled=false", "--offers.search.enabled=false")) {
+                    "--offers.publisher.enabled=false", "--offers.indexer.enabled=false", "--offers.search.enabled=false",
+                    "--offers.feeds.enabled=false", "--offers.feeds.worker-enabled=false")) {
                 var json = context.getBean(JsonMapper.class);
                 var store = new RebuildStore(context.getBean(JdbcTemplate.class),
                         context.getBean(PlatformTransactionManager.class), json, options.maxOffers());

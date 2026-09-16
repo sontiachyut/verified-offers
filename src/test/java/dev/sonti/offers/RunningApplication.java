@@ -67,11 +67,17 @@ final class RunningApplication implements AutoCloseable {
         throw new IllegalStateException("Application did not become healthy before exit/deadline.");
     }
     JsonNode request(String method, String path, Object body, int expected) throws Exception {
+        return rawRequest(method, path, body == null ? null : json.writeValueAsBytes(body),
+                java.util.Map.of("Content-Type", "application/json"), false, expected);
+    }
+    JsonNode rawRequest(String method, String path, byte[] body, java.util.Map<String, String> headers,
+            boolean chunked, int expected) throws Exception {
         var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
-                .timeout(Duration.ofSeconds(10)).header("Content-Type", "application/json")
-                .method(method, body == null ? HttpRequest.BodyPublishers.noBody() :
-                        HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body))).build();
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                .timeout(Duration.ofSeconds(10));
+        headers.forEach(request::header);
+        request.method(method, body == null ? HttpRequest.BodyPublishers.noBody() : chunked
+                ? HttpRequest.BodyPublishers.ofInputStream(() -> new java.io.ByteArrayInputStream(body)) : HttpRequest.BodyPublishers.ofByteArray(body));
+        var response = client.send(request.build(), HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != expected) throw new AssertionError("Expected " + expected + " got " + response.statusCode() + ": " + response.body());
         return json.readTree(response.body());
     }

@@ -153,6 +153,8 @@ class OnlineRebuildIT extends PostgresFixture {
         builder.environment().put("OFFERS_PUBLISHER_ENABLED", "true");
         builder.environment().put("OFFERS_INDEXER_ENABLED", "true");
         builder.environment().put("OFFERS_SEARCH_ENABLED", "true");
+        builder.environment().put("OFFERS_FEEDS_ENABLED", "true");
+        builder.environment().put("OFFERS_FEEDS_WORKER_ENABLED", "true");
         var process = builder.start();
         try {
             assertThat(process.waitFor(25, TimeUnit.SECONDS)).as("one-shot process exits itself").isTrue();

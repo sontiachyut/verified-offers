@@ -37,6 +37,11 @@ and audited actions now pass the full Maven gate: 124 tests (54 unit/helper,
 70 integration), zero failures/errors/skips. Nine real PostgreSQL feed tests
 cover admission races, rollback, takeover, parallel workers and immutable receipts.
 HTTP/CLI and packaged process recovery are still the next P4a acceptance slice.
+HTTP/worker slice now passes the full Maven gate: 133 tests (59 unit/helper,
+74 integration), zero failures/errors/skips. Includes chunked upload bounds,
+four-upload admission, packaged status/step, forced worker JVM interruption,
+restart recovery and feed → Kafka → verified search. Final P4a walkthrough,
+shipped example validation and handoff documentation are being completed.
 
 The local P3 functional gate is complete, including rebuild and stable pages.
 Define the bounded feed-upload and durable job contract before implementation:
