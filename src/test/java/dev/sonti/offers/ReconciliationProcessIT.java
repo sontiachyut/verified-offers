@@ -29,7 +29,15 @@ class ReconciliationProcessIT extends PostgresFixture {
             assertThat(command(alias, "--reconcile=status", "--id=" + id).path("attempts").asInt()).isZero();
             assertThat(command(alias, "--reconcile=step", "--id=" + id).path("completedAt").isNull()).isFalse();
             assertThat(command(alias, "--reconcile=step", "--id=" + id).path("attempts").asInt()).isEqualTo(1);
-            assertThat(index.matches(List.of(tombstone))).isTrue();
+            index.refresh();
+            assertThat(index.candidates("t", "keyboard", 10)).isEmpty();
+            try (var http = java.net.http.HttpClient.newHttpClient()) {
+                var response = http.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(endpoint() + "/" + alias + "/_doc/t:m:o"))
+                        .timeout(Duration.ofSeconds(5)).GET().build(), java.net.http.HttpResponse.BodyHandlers.ofString());
+                assertThat(response.statusCode()).isEqualTo(200);
+                assertThat(json.readTree(response.body()).path("_version").asLong()).isEqualTo(2);
+                assertThat(json.readTree(response.body()).path("_source").path("deleted").asBoolean()).isTrue();
+            }
             assertThat(sql.queryForObject("SELECT count(*) FROM outbox WHERE published_at IS NOT NULL", Integer.class)).isZero();
         }
     }
