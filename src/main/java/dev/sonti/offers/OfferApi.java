@@ -21,16 +21,18 @@ class DemoConfiguration {
 @RequestMapping("/api/v1")
 class OfferApi {
     private final OfferCatalog catalog;
-    OfferApi(OfferCatalog catalog) { this.catalog = catalog; }
+    private final ApiAccess access;
+    OfferApi(OfferCatalog catalog, ApiAccess access) { this.catalog = catalog; this.access = access; }
 
     @PutMapping("/offers")
-    Offer ingest(@RequestBody Offer offer) { return catalog.ingest(offer); }
+    Offer ingest(@RequestBody Offer offer) { access.write(offer.tenantId(), offer.merchantId()); return catalog.ingest(offer); }
 
     @GetMapping("/offers/{tenantId}/{merchantId}/{offerId}")
     Offer get(@PathVariable String tenantId, @PathVariable String merchantId, @PathVariable String offerId) {
+        access.read(tenantId);
         return catalog.get(tenantId, merchantId, offerId);
     }
 
     @PostMapping("/verifications")
-    Catalog.Verification verify(@RequestBody Catalog.Claim claim) { return catalog.verify(claim); }
+    Catalog.Verification verify(@RequestBody Catalog.Claim claim) { access.read(claim.tenantId()); return catalog.verify(claim); }
 }

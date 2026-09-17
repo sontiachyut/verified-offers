@@ -12,15 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "offers.search.enabled", havingValue = "true")
 class SearchApi {
     private final SearchPages search;
-    SearchApi(SearchPages search) { this.search = search; }
+    private final ApiAccess access;
+    SearchApi(SearchPages search, ApiAccess access) { this.search = search; this.access = access; }
     @GetMapping("/api/v1/search")
     SearchPages.Page search(@RequestParam String tenantId, @RequestParam String q,
             @RequestParam(defaultValue = "10") int limit, @RequestParam(required = false) String cursor) {
+        access.read(tenantId);
         return search.search(tenantId, q, limit, cursor);
     }
     @DeleteMapping("/api/v1/search")
     java.util.Map<String, Boolean> close(@RequestParam String tenantId, @RequestParam String q,
             @RequestParam(defaultValue = "10") int limit, @RequestParam String cursor) {
+        access.read(tenantId);
         search.cancel(tenantId, q, limit, cursor);
         return java.util.Map.of("closed", true);
     }
