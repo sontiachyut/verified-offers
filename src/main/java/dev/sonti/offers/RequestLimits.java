@@ -20,6 +20,9 @@ final class RequestLimits extends OncePerRequestFilter {
         int maximum = upload ? 1_048_576 : 16_384;
         if (request.getHeader("Content-Encoding") != null) { reject(response, 415); return; }
         if (request.getContentLengthLong() > maximum) { reject(response, 413); return; }
+        // FeedInput enforces actual bytes AFTER FeedApi acquires its four-upload permit.
+        // Never pre-buffer request-thread-sized feed bodies ahead of that boundary.
+        if (upload) { chain.doFilter(request, response); return; }
         byte[] bytes = request.getInputStream().readNBytes(maximum + 1);
         if (bytes.length > maximum) { reject(response, 413); return; }
         chain.doFilter(new HttpServletRequestWrapper(request) {

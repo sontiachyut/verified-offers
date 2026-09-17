@@ -5,6 +5,12 @@ import org.springframework.mock.web.*;
 import static org.assertj.core.api.Assertions.*;
 
 class RequestLimitsTest {
+    @Test void feedStreamsAreNotReadAheadOfFeedAdmission() throws Exception {
+        var request = new MockHttpServletRequest("POST", "/api/v1/feeds/t/m") {
+            @Override public jakarta.servlet.ServletInputStream getInputStream() { throw new AssertionError("Feed permit must precede stream reads"); }
+        };
+        new RequestLimits().doFilter(request, new MockHttpServletResponse(), (r, s) -> assertThat(r).isSameAs(request));
+    }
     @Test void rejectsOversizedJsonWithNoDownstreamCall() throws Exception {
         var request = new MockHttpServletRequest("PUT", "/api/v1/offers");
         request.setContent(new byte[16_385]);
