@@ -30,7 +30,7 @@ The local P3 functional gate is complete. P4a durable merchant feed jobs are now
 complete: bounded admission, atomic row receipts, restart recovery and the tested
 feed-to-search pipeline; see [feed evidence](validation/P4a.md).
 P4b's local functional gate now passes: React search/feed investigation,
-37 focused interaction/DOM tests and a real-API UI walkthrough; see
+38 focused interaction/DOM tests and a real-API UI walkthrough; see
 [console evidence](validation/P4b.md). P4 local functionality is implemented.
 A connected-browser visual/native-interaction review remains explicitly open;
 automated DOM tests are not a substitute for that review.

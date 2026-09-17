@@ -318,6 +318,7 @@ class OnlineRebuildIT extends PostgresFixture {
             var runner = new OnlineRebuild(store, window, json); var run = runner.create(endpoint(), alias);
             admin.createPartitions(Map.of(KafkaOfferSink.TOPIC, org.apache.kafka.clients.admin.NewPartitions.increaseTo(4)))
                     .all().get(10, TimeUnit.SECONDS);
+            awaitTopicMetadata(admin, 4, null);
             runner.step(run.id());
             assertThat(runner.step(run.id())).isEqualTo(OnlineRebuild.Result.RETRY);
             assertThat(store.get(run.id()).lastError()).isEqualTo("WINDOW_INVALID");
@@ -325,11 +326,32 @@ class OnlineRebuildIT extends PostgresFixture {
             var second = runner.create(endpoint(), alias);
             admin.deleteTopics(List.of(KafkaOfferSink.TOPIC)).all().get(10, TimeUnit.SECONDS);
             admin.createTopics(List.of(new NewTopic(KafkaOfferSink.TOPIC, 3, (short) 1))).all().get(10, TimeUnit.SECONDS);
+            awaitTopicMetadata(admin, 3, second.start().topicId());
             assertThat(window.capture().topicId()).isNotEqualTo(second.start().topicId());
             runner.step(second.id());
             assertThat(runner.step(second.id())).isEqualTo(OnlineRebuild.Result.RETRY);
             assertThat(store.get(second.id()).lastError()).isEqualTo("WINDOW_INVALID");
             runner.abort(second.id());
         }
+    }
+
+    private static void awaitTopicMetadata(Admin admin, int partitions, String previousTopicId) throws Exception {
+        // CreateTopics/CreatePartitions acknowledgement precedes broker metadata
+        // visibility. Wait only for fixture readiness; do not retry the rebuild
+        // steps or weaken their WINDOW_INVALID assertions.
+        RunningApplication.awaitReady(broker::isRunning, () -> {
+            try {
+                var topic = admin.describeTopics(List.of(KafkaOfferSink.TOPIC)).allTopicNames()
+                        .get(5, TimeUnit.SECONDS).get(KafkaOfferSink.TOPIC);
+                return topic.partitions().size() == partitions
+                        && !topic.topicId().toString().equals(previousTopicId)
+                        && topic.partitions().stream().allMatch(partition -> partition.leader() != null
+                                && partition.leader().id() >= 0 && !partition.isr().isEmpty());
+            } catch (java.util.concurrent.ExecutionException unavailable) {
+                if (unavailable.getCause() instanceof org.apache.kafka.common.errors.UnknownTopicOrPartitionException)
+                    return false;
+                throw unavailable;
+            }
+        }, Duration.ofSeconds(20));
     }
 }

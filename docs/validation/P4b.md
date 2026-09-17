@@ -4,7 +4,7 @@ Date: 2026-09-16 (America/Phoenix). Synthetic local reference implementation.
 
 ## Exercised client behavior
 
-- 37 focused tests: search idle/loading/empty/error states; empty-page cursor
+- 38 focused tests: search idle/loading/empty/error states; empty-page cursor
   continuation; frozen tenant/query/page size; 503 same-cursor retry; explicit
   410/local expiry; unmount/late-response cleanup; keyboard form submission;
   untrusted text escaping; exact Java long prices/versions and source microseconds.
@@ -53,9 +53,21 @@ The final `./mvnw --batch-mode --no-transfer-progress verify` run also passed:
 zero failures/errors/skips. It ran at lower OS scheduling priority with
 `JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=2 -Xmx512m'`, taking 2:58 locally.
 The four-assertion HTTP demo passed afterward. The final frontend check reran
-all 37 tests, formatting, TypeScript (including integration sources) and build.
+all 38 tests, formatting, TypeScript (including integration sources) and build.
 CI now repeats the client checks and the real-dependency console walkthrough
 in addition to the backend suite; inspect the exact pushed revision's result.
+
+Follow-up review reproduced an upload lifecycle failure under React's development
+effect cleanup/remount cycle. The mounted guard now resets on setup, and a
+StrictMode regression test passes. The 38-test count includes that additional case.
+
+CI run 35171217205 exposed an existing topic-recreation fixture race at
+OnlineRebuildIT's immediate post-create metadata capture. Kafka explicitly notes
+that [creation acknowledgement precedes metadata visibility](https://kafka.apache.org/40/javadoc/org/apache/kafka/clients/admin/Admin.html).
+The fixture now waits up to 20 seconds for the expected partition count, leaders
+and new topic identity before invoking the same original assertions. Only
+UnknownTopicOrPartition is treated as transient fixture readiness; other errors
+still fail. Production capture/rebuild behavior is unchanged; no suite is skipped.
 
 ## Explicit limits
 

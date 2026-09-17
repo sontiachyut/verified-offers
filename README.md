@@ -81,7 +81,7 @@ packaged Java jar and Docker; it cleans up only its synthetic test stack.
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
 - Coordinated rebuild with topic-identity/retention checks, source-validated Kafka catch-up, durable indexing pause and atomic alias handoff. Interrupted switches reconcile forward; unsafe rollback is refused.
 - 134 passing tests, including actual database/broker/index integration, atomic feed rollback, forced worker restart, full feed-to-search delivery, stable pagination and interrupted index handoff recovery. See [feed evidence](docs/validation/P4a.md), [pagination evidence](docs/validation/P3c3.md) and [handoff evidence](docs/validation/P3c2b.md).
-- 37 console tests plus a real-API React walkthrough covering mixed feed receipts, idempotent recovery, verified pagination and source-deletion exclusion. See [console acceptance evidence and visual-review limits](docs/validation/P4b.md).
+- 38 console tests plus a real-API React walkthrough covering mixed feed receipts, idempotent recovery, verified pagination and source-deletion exclusion. See [console acceptance evidence and visual-review limits](docs/validation/P4b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 

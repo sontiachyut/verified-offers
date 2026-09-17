@@ -268,12 +268,12 @@ function UploadPanel({
   const [fileKey, setFileKey] = useState(0);
   const [attempted, setAttempted] = useState(false);
   const mounted = useRef(true);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
       mounted.current = false;
-    },
-    [],
-  );
+    };
+  }, []);
   useEffect(() => {
     onLock(busy || (upload !== null && !accepted));
   }, [busy, upload, accepted, onLock]);

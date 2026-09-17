@@ -1,4 +1,5 @@
 import { webcrypto } from 'node:crypto';
+import { StrictMode } from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -241,6 +242,22 @@ describe('feed investigation', () => {
   });
 });
 describe('feed admission', () => {
+  it('can submit after a development effect cleanup and remount', async () => {
+    vi.stubGlobal('crypto', webcrypto);
+    fixtureFetch((_url, init) =>
+      init?.method === 'POST' ? reply({ created: true, job }) : undefined,
+    );
+    render(
+      <StrictMode>
+        <FeedWorkspace />
+      </StrictMode>,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Open feed scope' }));
+    await user.upload(await screen.findByLabelText('Feed file'), file());
+    submitFeed();
+    expect(await screen.findByText('Feed admitted.')).toBeInTheDocument();
+  });
   it('hashes and sends exact bytes including CRLF, preserving a retry identity', async () => {
     vi.stubGlobal('crypto', webcrypto);
     const input = file();
