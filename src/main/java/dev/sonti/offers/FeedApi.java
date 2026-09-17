@@ -63,6 +63,6 @@ class FeedApi {
             @PathVariable String action, @RequestBody Control body) {
         access.operate(tenantId, merchantId);
         if (body == null) throw new IllegalArgumentException("Reason required.");
-        return store.control(tenantId, merchantId, id, action.toUpperCase(java.util.Locale.ROOT), body.reason());
+        return store.control(tenantId, merchantId, id, action.toUpperCase(java.util.Locale.ROOT), body.reason(), access.actor());
     }
 }

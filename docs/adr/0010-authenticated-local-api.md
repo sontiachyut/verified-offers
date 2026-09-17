@@ -29,3 +29,10 @@ remote endpoints require HTTPS. Issuer/audience are mandatory, not defaults.
 Tests cover signature, issuer, audience, timestamps, scopes and all route scopes.
 
 Reference: [Spring resource-server JWT contract](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html).
+
+Authenticated feed control actions also persist the verified subject and an
+authentication marker with the existing immutable action/reason/time record.
+The subject is taken from the security context, never the request body. Legacy
+and unauthenticated local actions are explicitly labeled `local-operator`, false;
+do not retroactively attribute them to a verified identity. Subjects are scoped
+audit data, never metric labels or application request-log fields.

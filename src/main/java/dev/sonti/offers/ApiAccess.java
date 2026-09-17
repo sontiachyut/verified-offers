@@ -10,6 +10,18 @@ import org.springframework.stereotype.Component;
 final class ApiAccess {
     private final boolean enabled;
     ApiAccess(@Value("${offers.security.enabled:false}") boolean enabled) { this.enabled = enabled; }
+    record Actor(String subject, boolean authenticated) {
+        Actor {
+            if (subject == null || subject.isBlank() || subject.length() > 200) throw new IllegalArgumentException("Valid audit subject required.");
+        }
+    }
+    Actor actor() {
+        if (!enabled) return new Actor("local-operator", false);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof JwtAuthenticationToken jwt) || !jwt.isAuthenticated())
+            throw new DomainException(401, "Authentication required.");
+        return new Actor(jwt.getToken().getSubject(), true);
+    }
     void read(String tenant) { check(tenant, null, "offers:read"); }
     void feedRead(String tenant, String merchant) { check(tenant, merchant, "offers:read"); }
     void write(String tenant, String merchant) { check(tenant, merchant, "offers:write"); }

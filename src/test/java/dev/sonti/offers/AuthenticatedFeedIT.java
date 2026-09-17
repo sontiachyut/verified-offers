@@ -41,6 +41,8 @@ class AuthenticatedFeedIT extends PostgresFixture {
                     Map.of("Authorization", "Bearer " + owner, "Content-Type", "application/json"), false, 200);
             assertThat(cancelled.path("state").asString()).isEqualTo("CANCELLED");
             assertThat(sql.queryForObject("SELECT count(*) FROM feed_action WHERE job_id=?::uuid", Integer.class, id)).isEqualTo(1);
+            assertThat(sql.queryForObject("SELECT actor_subject FROM feed_action WHERE job_id=?::uuid", String.class, id)).isEqualTo("synthetic-user");
+            assertThat(sql.queryForObject("SELECT authenticated FROM feed_action WHERE job_id=?::uuid", Boolean.class, id)).isTrue();
         }
     }
 }

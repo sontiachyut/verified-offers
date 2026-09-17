@@ -23,7 +23,7 @@ final class FeedStore {
                String state, String reason, Instant finishedAt) {}
     record Rows(List<Row> rows, Integer nextAfter) {}
     record Jobs(List<Job> jobs, UUID nextAfter) {}
-    record Action(long id, String action, String reason, Instant createdAt) {}
+    record Action(long id, String action, String reason, Instant createdAt, String actorSubject, boolean authenticated) {}
     static final class LeaseLost extends RuntimeException {}
     private final JdbcTemplate sql;
     private final TransactionTemplate tx;
@@ -94,7 +94,8 @@ final class FeedStore {
     List<Action> actions(String tenant, String merchant, UUID id) {
         get(tenant, merchant, id);
         return sql.query("SELECT * FROM feed_action WHERE job_id=? ORDER BY action_id LIMIT 20",
-                (rs, row) -> new Action(rs.getLong("action_id"), rs.getString("action"), rs.getString("reason"), instant(rs, "created_at")), id);
+                (rs, row) -> new Action(rs.getLong("action_id"), rs.getString("action"), rs.getString("reason"), instant(rs, "created_at"),
+                        rs.getString("actor_subject"), rs.getBoolean("authenticated")), id);
     }
     Optional<Claim> claim() {
         UUID token = UUID.randomUUID();
@@ -147,6 +148,9 @@ final class FeedStore {
                 """, claim.id(), claim.token());
     }
     Job control(String tenant, String merchant, UUID id, String action, String reason) {
+        return control(tenant, merchant, id, action, reason, new ApiAccess.Actor("local-operator", false));
+    }
+    Job control(String tenant, String merchant, UUID id, String action, String reason, ApiAccess.Actor actor) {
         scope(tenant, merchant); Input.identifier(reason);
         if (!List.of("RETRY", "CANCEL").contains(action)) throw new IllegalArgumentException("Invalid feed action.");
         return tx.execute(status -> {
@@ -157,7 +161,8 @@ final class FeedStore {
                 throw new DomainException(409, "Feed action not allowed in this state.");
             }
             if (sql.queryForObject("SELECT count(*) FROM feed_action WHERE job_id=?", Integer.class, id) >= 20) throw new DomainException(409, "Feed action budget reached.");
-            sql.update("INSERT INTO feed_action(job_id,action,reason) VALUES (?,?,?)", id, action, reason);
+            sql.update("INSERT INTO feed_action(job_id,action,reason,actor_subject,authenticated) VALUES (?,?,?,?,?)",
+                    id, action, reason, actor.subject(), actor.authenticated());
             if (action.equals("RETRY")) {
                 sql.update("UPDATE feed_job SET state='QUEUED',failures=0,last_error=NULL,available_at=statement_timestamp() WHERE job_id=?", id);
             } else {
