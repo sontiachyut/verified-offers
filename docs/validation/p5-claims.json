@@ -1,0 +1,150 @@
+{
+  "baseline" : "explicit-usd-regex-v1",
+  "cases" : [ {
+    "id" : "h01",
+    "expectedMinor" : 24995,
+    "actualMinor" : 24995,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 370084
+  }, {
+    "id" : "h02",
+    "expectedMinor" : 801,
+    "actualMinor" : 801,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 60250
+  }, {
+    "id" : "h03",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "AMBIGUOUS_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 47750
+  }, {
+    "id" : "h04",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_CURRENCY",
+    "matches" : true,
+    "elapsedNanos" : 36459
+  }, {
+    "id" : "h05",
+    "expectedMinor" : 99,
+    "actualMinor" : 99,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 70291
+  }, {
+    "id" : "h06",
+    "expectedMinor" : 10900,
+    "actualMinor" : 10900,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 86167
+  }, {
+    "id" : "h07",
+    "expectedMinor" : 1200,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_FORMAT",
+    "matches" : false,
+    "elapsedNanos" : 49666
+  }, {
+    "id" : "h08",
+    "expectedMinor" : 129900,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_FORMAT",
+    "matches" : false,
+    "elapsedNanos" : 38083
+  }, {
+    "id" : "h09",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "NO_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 46500
+  }, {
+    "id" : "h10",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_FORMAT",
+    "matches" : true,
+    "elapsedNanos" : 37000
+  }, {
+    "id" : "h11",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_CURRENCY",
+    "matches" : true,
+    "elapsedNanos" : 4041
+  }, {
+    "id" : "h12",
+    "expectedMinor" : 3450,
+    "actualMinor" : 3450,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 74417
+  }, {
+    "id" : "h13",
+    "expectedMinor" : 100,
+    "actualMinor" : 100,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 117459
+  }, {
+    "id" : "h14",
+    "expectedMinor" : null,
+    "actualMinor" : 500,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : false,
+    "elapsedNanos" : 87875
+  }, {
+    "id" : "h15",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_FORMAT",
+    "matches" : true,
+    "elapsedNanos" : 45875
+  }, {
+    "id" : "h16",
+    "expectedMinor" : null,
+    "actualMinor" : null,
+    "reason" : "AMBIGUOUS_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 46667
+  }, {
+    "id" : "h17",
+    "expectedMinor" : 89999,
+    "actualMinor" : 89999,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 69583
+  }, {
+    "id" : "h18",
+    "expectedMinor" : null,
+    "actualMinor" : 2000,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : false,
+    "elapsedNanos" : 47958
+  }, {
+    "id" : "h19",
+    "expectedMinor" : 1999,
+    "actualMinor" : null,
+    "reason" : "UNSUPPORTED_FORMAT",
+    "matches" : false,
+    "elapsedNanos" : 31333
+  }, {
+    "id" : "h20",
+    "expectedMinor" : 999,
+    "actualMinor" : 999,
+    "reason" : "EXPLICIT_USD_AMOUNT",
+    "matches" : true,
+    "elapsedNanos" : 29666
+  } ],
+  "precision" : 0.8,
+  "recall" : 0.7272727272727273,
+  "coverage" : 0.5,
+  "falseProposals" : 2,
+  "paidModelCalls" : 0,
+  "inferenceApiSpendUsd" : 0
+}

@@ -1,0 +1,80 @@
+{
+  "queries" : [ {
+    "recallAt10" : 1.0,
+    "query" : "mechanical keyboard",
+    "id" : "q01",
+    "ndcgAt10" : 0.9941825709069458,
+    "ranking" : [ "k1", "k2", "k4", "k3" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "wireless mouse",
+    "id" : "q02",
+    "ndcgAt10" : 1.0,
+    "ranking" : [ "m1", "k3", "m2", "m3", "a3", "k1", "h2", "h1", "n1" ]
+  }, {
+    "recallAt10" : 0.5,
+    "query" : "USB C charger",
+    "id" : "q03",
+    "ndcgAt10" : 0.9173194127129571,
+    "ranking" : [ "a1", "a2", "a4", "s1", "d1", "c1" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "noise cancelling headphones",
+    "id" : "q04",
+    "ndcgAt10" : 0.992619504174702,
+    "ranking" : [ "h1", "h2", "h4", "h3" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "portable SSD",
+    "id" : "q05",
+    "ndcgAt10" : 1.0,
+    "ranking" : [ "s1", "s2", "s3" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "4K monitor",
+    "id" : "q06",
+    "ndcgAt10" : 0.9828422279067397,
+    "ranking" : [ "d1", "d3", "d2" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "webcam",
+    "id" : "q07",
+    "ndcgAt10" : 0.6309297535714575,
+    "ranking" : [ "c2", "c1" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "ergonomic pointing device",
+    "id" : "q08",
+    "ndcgAt10" : 1.0,
+    "ranking" : [ "m1" ]
+  }, {
+    "recallAt10" : 0.0,
+    "query" : "laptop docking station",
+    "id" : "q09",
+    "ndcgAt10" : 0.0,
+    "ranking" : [ "c2" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "wireless router",
+    "id" : "q10",
+    "ndcgAt10" : 1.0,
+    "ranking" : [ "n1", "a3", "k1", "m1", "h2", "k3", "h1" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "USB C cable",
+    "id" : "q11",
+    "ndcgAt10" : 1.0,
+    "ranking" : [ "a2", "a4", "s1", "a1", "d1", "c1" ]
+  }, {
+    "recallAt10" : 1.0,
+    "query" : "monitor stand",
+    "id" : "q12",
+    "ndcgAt10" : 1.0,
+    "ranking" : [ "d3", "d2", "d1" ]
+  } ],
+  "baseline" : "opensearch-3.8.0-title-bm25",
+  "meanRecallAt10" : 0.875,
+  "catalogSize" : 24,
+  "meanNdcgAt10" : 0.8764911224394002,
+  "paidModelCalls" : 0
+}
