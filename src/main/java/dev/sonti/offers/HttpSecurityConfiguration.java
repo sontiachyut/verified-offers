@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /** Local profiles deliberately remain unauthenticated unless the owner opts into JWT mode. */
 @Configuration(proxyBeanMethods = false)
+@org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication(type = org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET)
 class HttpSecurityConfiguration {
     @Bean
     @ConditionalOnProperty(name = "offers.security.enabled", havingValue = "false", matchIfMissing = true)

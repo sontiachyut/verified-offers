@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration(proxyBeanMethods = false)
+@org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication(type = org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnProperty(name = "offers.security.enabled", havingValue = "true")
 class JwtSecurityConfiguration {
     @Bean JwtDecoder jwtDecoder(@Value("${offers.security.issuer}") String issuer,
