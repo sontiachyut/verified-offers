@@ -6,13 +6,13 @@ milestone is pushed independently; no empty commits or manufactured history.
 
 ## Remaining release gates
 
-- [ ] Signed JWT authentication, issuer/audience/time validation, safe failures
-- [ ] Tenant and merchant object authorization across every HTTP route
-- [ ] Separate read, write and operator scopes; deny-by-default routing
-- [ ] Authenticated HTTP isolation tests with real signatures
-- [ ] Bounded request bodies and per-tenant request admission
-- [ ] Safe request correlation and bounded operational metrics
-- [ ] Documented identity-provider integration and security threat model
+- [x] Signed JWT authentication, issuer/audience/time validation, safe failures
+- [x] Tenant and merchant object authorization across existing HTTP routes
+- [x] Separate read, write and operator scopes; deny-by-default routing
+- [x] Authenticated HTTP isolation tests with real signatures
+- [x] Bounded request bodies and per-tenant request admission
+- [x] Safe request correlation and bounded operational metrics
+- [x] Documented identity-provider configuration and trust boundaries (external provider drill remains deployment work)
 - [ ] Audited, bounded index-quarantine resolution without trusting poison data
 - [ ] Recovery tests covering retries, failures and audit preservation
 - [ ] Explicit retention decisions that preserve replay and forensic evidence
@@ -48,5 +48,12 @@ Optional multi-node/cloud experiments are not local correctness evidence.
 4. Feed authorization: every feed route rejects before touching the store.
 5. Signed JWT resource server: eight real HTTP tests with ephemeral RSA/JWKS;
    wrong signature, issuer, audience, scope, identity and expiry fail closed.
+6. Body/connection limits: JSON/feed budgets, chunked bytes and encoding tests.
+7. Tenant admission: bounded buckets, refill/isolation/concurrent-spend tests.
+8. Non-web CLI startup: HTTP security does not require servlet beans or issuer.
+9. Safe telemetry: generated request IDs, bounded metrics, authentication runbook.
+10. Packaged authenticated feed test against PostgreSQL: own-scope reads/cancel,
+    cross-tenant/merchant denials and exactly one authorized audit action pass.
+    Corrected telemetry test resource cleanup; focused telemetry/JWT tests pass.
 
 Further entries are appended with the implemented behavior and focused evidence.

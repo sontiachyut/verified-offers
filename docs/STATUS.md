@@ -4,6 +4,11 @@ Last updated: 2026-09-16
 
 ## Completed
 
+- P5 security slice: opt-in RS256 JWT resource server, verified tenant/merchant scope,
+  separate read/write/operator permissions, bounded request bodies and tenant budgets,
+  safe request correlation. Signed HTTP tests and packaged PostgreSQL feed-isolation
+  test pass. See [authentication](AUTHENTICATION.md) and [release ledger](COMPLETION.md).
+
 - P0: specification, invariants, APIs, security gates, capacity methodology and acceptance-gated roadmap.
 - P1: Java 21/Spring Boot 4.1.1 local reference model, HTTP API, Maven wrapper, CI and synthetic demonstration.
 - P2: PostgreSQL 17.11, Flyway migrations, JDBC adapter and atomic transactional outbox. The in-memory adapter remains separately available.
@@ -25,7 +30,13 @@ Last updated: 2026-09-16
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: browser review, then choose the next operational gate
+## Current task: finish remaining local release gates
+
+The owner accepted the UI appearance and requested continued implementation with
+at least 30 substantive commit/push milestones. Follow `COMPLETION.md`: security,
+audited quarantine recovery, evaluation, restore/load evidence and packaging.
+No public deployment, paid infrastructure or production-readiness claim is implied.
+The historical P4 evidence below remains valid for its recorded revision.
 
 P4a/P4b local functional gates now pass. Finish a connected-browser visual pass
 when available and approved: narrow/desktop viewport, contrast, native file
@@ -46,7 +57,9 @@ runtime. Optional AI evaluation remains later work, not an implemented claim.
 
 ## Explicit limits / open decisions
 
-- postgres-local persists state; local-demo remains volatile. Both profiles are unauthenticated and loopback-only. No real data or public exposure.
+- postgres-local persists state; local-demo remains volatile. Both are loopback-only
+  and unauthenticated by default; opt-in JWT mode is documented in AUTHENTICATION.md.
+  No real data or public exposure.
 - Publishing, search, indexing and feeds are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Feed background processing has its own enable flag. The local console wraps these APIs; no model integration yet.
 - Images require security remediation/review: see [database scan](validation/IMAGE-SECURITY.md), [Kafka scan](validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch scan](validation/OPENSEARCH-IMAGE-SECURITY.md). Re-scan, production database roles, auth, restore drills and cloud sizing/cost remain deployment gates.
 - Correctness tests are not throughput, uptime, failover or representative scale measurements.
