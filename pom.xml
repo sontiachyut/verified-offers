@@ -11,7 +11,11 @@
     <artifactId>verified-offers</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>verified-offers</name>
-    <properties><java.version>21</java.version></properties>
+    <properties>
+        <java.version>21</java.version>
+        <!-- Security patch above Boot 4.1.1's 11.0.24 BOM; see application-image scan record. -->
+        <tomcat.version>11.0.26</tomcat.version>
+    </properties>
     <dependencies>
         <dependency><groupId>io.micrometer</groupId><artifactId>micrometer-registry-prometheus</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId></dependency>
