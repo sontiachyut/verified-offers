@@ -49,3 +49,15 @@ packaged HTTP continuation/close; full regression gate.
 
 References: [PIT semantics](https://docs.opensearch.org/latest/search-plugins/searching-data/point-in-time/)
 and [pagination](https://docs.opensearch.org/latest/search-plugins/searching-data/paginate/).
+
+## 2026-09-16 measured-capacity preparation amendment
+
+Review before load testing exposed a structural ceiling: retaining every
+successfully closed reservation limits new searches to roughly 128 per 130s,
+independent of actual dependency capacity. Reclaim a reservation early ONLY when
+the Delete PIT response explicitly acknowledges successful deletion of every
+requested PIT ID. HTTP 200 alone is not proof. Lost/failed/partial acknowledgements
+and failed opens still retain reservations through the expiry grace; abandoned
+contexts keep the existing limit. Removed sessions return 410 for old cursors,
+preserving cancellation semantics. This replaces only the successful-close
+retention rule above, not the leak budget or the eight-request concurrency limit.

@@ -10,6 +10,26 @@ import static org.assertj.core.api.Assertions.*;
 
 class OpenSearchIndexTest {
     private final JsonMapper json = JsonMapper.builder().build();
+    @Test void pitDeletionRequiresExactSuccessfulAcknowledgements() throws Exception {
+        var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        var body = new java.util.concurrent.atomic.AtomicReference<>("{}");
+        server.createContext("/", exchange -> {
+            exchange.getRequestBody().readAllBytes(); byte[] bytes = body.get().getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (var output = exchange.getResponseBody()) { output.write(bytes); }
+        }); server.start();
+        try (var index = new OpenSearchIndex("http://127.0.0.1:" + server.getAddress().getPort(), "offers", json)) {
+            for (String response : new String[] {"{}", "{\"pits\":[]}",
+                    "{\"pits\":[{\"pit_id\":\"one\",\"successful\":false}]}",
+                    "{\"pits\":[{\"pit_id\":\"other\",\"successful\":true}]}",
+                    "{\"pits\":[{\"pit_id\":\"one\",\"successful\":\"true\"}]}"}) {
+                body.set(response);
+                assertThatThrownBy(() -> index.closePointsInTime(java.util.List.of("one"))).isInstanceOf(DomainException.class);
+            }
+            body.set("{\"pits\":[{\"pit_id\":\"one\",\"successful\":true}]}");
+            assertThatCode(() -> index.closePointsInTime(java.util.List.of("one"))).doesNotThrowAnyException();
+        } finally { server.stop(0); }
+    }
     @Test void rejectsNonLoopbackEndpointsAndUnsafeIndexNames() {
         for (String uri : new String[]{"https://127.0.0.1:9200", "http://example.com:9200", "http://user:pass@127.0.0.1:9200",
                 "http://127.0.0.1:9200/path", "http://127.0.0.1:9200?query", "http://127.0.0.1:9200#fragment", "http://127.0.0.1"}) {

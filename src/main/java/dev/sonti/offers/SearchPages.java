@@ -128,7 +128,10 @@ final class SearchPages implements AutoCloseable {
     private void finish(Session session) {
         session.closed = true;
         if (session.pit != null) {
-            try { source.close(List.of(session.pit)); }
+            try {
+                source.close(List.of(session.pit)); // Returns only after confirmed backend deletion.
+                synchronized (this) { sessions.remove(session.id, session); }
+            }
             catch (RuntimeException ignored) { /* Fixed backend expiry plus retained admission reservation bounds leaks. */ }
         }
     }

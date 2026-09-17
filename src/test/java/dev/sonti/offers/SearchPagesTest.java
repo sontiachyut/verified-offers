@@ -94,6 +94,14 @@ class SearchPagesTest {
         for (int i = 0; i < 128; i++) assertThat(pages.search("demo", "keyboard", 1, null).nextCursor()).isNull();
         status(429, () -> pages.search("demo", "keyboard", 1, null));
     }
+    @Test void acknowledgedCloseReclaimsAdmissionWithoutRevalidatingOldCursors() {
+        for (int i = 0; i < 300; i++) assertThat(pages.search("demo", "keyboard", 1, null).nextCursor()).isNull();
+        assertThat(source.opens).isEqualTo(300); assertThat(source.closes).isEqualTo(300);
+        fixtures(12, true);
+        String cursor = pages.search("demo", "keyboard", 1, null).nextCursor();
+        pages.cancel("demo", "keyboard", 1, cursor);
+        status(410, () -> pages.search("demo", "keyboard", 1, cursor));
+    }
     @Test void retryUsesSamePitAndCancelInvalidatesPriorCursors() {
         fixtures(12, true);
         String token = pages.search("demo", "keyboard", 1, null).nextCursor();

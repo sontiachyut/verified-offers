@@ -150,7 +150,14 @@ public final class OpenSearchIndex implements AutoCloseable, ShadowRebuild.Targe
         if (ids.size() > 128 || ids.stream().anyMatch(id -> id == null || id.isBlank() || id.length() > 16384)) {
             throw new IllegalArgumentException("Invalid PIT close bounds.");
         }
-        request("DELETE", "/_search/point_in_time", Map.of("pit_id", ids), false);
+        var response = request("DELETE", "/_search/point_in_time", Map.of("pit_id", ids), false).path("pits");
+        var remaining = new java.util.HashSet<>(ids);
+        if (!response.isArray() || response.size() != remaining.size()) throw unavailable();
+        for (var pit : response) {
+            if (!pit.path("successful").isBoolean() || !pit.path("successful").asBoolean()
+                    || !remaining.remove(pit.path("pit_id").asString())) throw unavailable();
+        }
+        if (!remaining.isEmpty()) throw unavailable();
     }
 
     void refresh() { request("POST", "/" + index + "/_refresh", Map.of(), false); }
