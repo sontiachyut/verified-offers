@@ -6,6 +6,11 @@ Check whether a merchant offer is current and supported by its source facts.
 
 A source-verification system with an evidence-first investigation console. **Durable merchant feeds flow through PostgreSQL and Kafka into search, which rechecks current source facts before returning verified offers.** This is a local development system, not a production deployment or a large-scale performance claim.
 
+The interesting boundary is what happens when systems disagree: a delayed index,
+retried event, stale price, deleted offer or interrupted rebuild must not turn into
+an unsupported “verified” result. The implementation and failure tests focus on
+that boundary, rather than treating successful indexing as proof of correctness.
+
 ## Run it
 
 Requirements: Java 21 and a running Docker daemon. Node.js 22+ and make are needed for the scripted HTTP demo. The Maven wrapper downloads a checksum-pinned distribution.
@@ -80,16 +85,41 @@ packaged Java jar and Docker; it cleans up only its synthetic test stack.
 - Local React console with lossless money/version evidence, explicit snapshot expiry, empty-page continuation, exact-byte upload retries and scoped feed investigation. Native forms/dialogs, visible keyboard focus and responsive layouts; no background polling or invented dashboard metrics.
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
 - Coordinated rebuild with topic-identity/retention checks, source-validated Kafka catch-up, durable indexing pause and atomic alias handoff. Interrupted switches reconcile forward; unsafe rollback is refused.
-- 134 passing tests, including actual database/broker/index integration, atomic feed rollback, forced worker restart, full feed-to-search delivery, stable pagination and interrupted index handoff recovery. See [feed evidence](docs/validation/P4a.md), [pagination evidence](docs/validation/P3c3.md) and [handoff evidence](docs/validation/P3c2b.md).
+- Opt-in signed JWT authentication, verified tenant/merchant authorization, separate read/write/operator scopes, actual-byte request limits and bounded per-tenant admission. Real RSA/JWKS HTTP tests and PostgreSQL feed-isolation tests. See [authentication](docs/AUTHENTICATION.md).
+- Audited quarantine-to-source reconciliation with immutable intent, bounded attempts and replay-safe recovery across processes. Invalid events never become trusted replacement data. See [recovery](docs/QUARANTINE.md).
+- Separately authored search judgments, real-index BM25 evaluation and an experimental deterministic extraction baseline. Raw errors are published; extraction stays off by default. See [evaluation and limitations](docs/EVALUATION.md).
+- Separate dependency readiness, protected Prometheus metrics, restricted database roles, independent-container backup/restore and a pinned non-root application image. See [operations](docs/OPERATIONS.md), [database roles](docs/DATABASE-ROLES.md), [restore](docs/BACKUP-RESTORE.md) and [packaging](docs/PACKAGING.md).
+- Automated Java unit/HTTP and real database/broker/index integration tests, including atomic feed rollback, forced restart, delivery, stable pagination and interrupted handoff. See [release gates](docs/COMPLETION.md), [feed evidence](docs/validation/P4a.md) and [handoff evidence](docs/validation/P3c2b.md).
 - 38 console tests plus a real-API React walkthrough covering mixed feed receipts, idempotent recovery, verified pagination and source-deletion exclusion. See [console acceptance evidence and visual-review limits](docs/validation/P4b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
-## Next phases — not yet implemented
+## Measurements, not scale claims
 
-Optional Python claim extraction follows an independently evaluated deterministic baseline. Real-browser visual/accessibility review remains separate from automated DOM checks and the real-API React walkthrough.
+The [bounded workload run](docs/LOAD.md) used 250 synthetic offers, 10 merchants,
+200 searches and 40 updates over 20 seconds, with two requests in flight. No
+failures were observed; search-plus-cursor-close p95 was 38.18ms on the recorded
+laptop. Raw samples are included. This is not the proposed 100k-offer workload,
+a sustained throughput ceiling, an index-freshness SLO or an HA demonstration.
 
-Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
+The [quality baseline](docs/EVALUATION.md) reports nDCG@10 0.87649 and Recall@10
+0.875 on 12 synthetic queries. Price extraction had two false proposals in 20
+held-out cases; it is experimental, not autonomous semantic understanding.
+
+## Remaining gates
+
+Optional model-assisted extraction/ranking requires a measured improvement over
+the checked-in baseline and separate approval for paid inference. Owner visual
+acceptance is recorded separately from formal browser/accessibility certification.
+
+Publishing, indexing, search, authentication and extraction are opt-in. No cloud
+resources have been provisioned. Representative-volume/load/freshness tests,
+production identity/TLS/network/secret setup, retention lifecycle beyond local
+admission caps, HA and deployment review remain open. The pinned
+[database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md)
+and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images have recorded
+vulnerability findings; pinned does not mean safe. See the [threat model](docs/THREAT-MODEL.md).
+Public deployment is not approved.
 
 ## Engineering documents
 

@@ -13,18 +13,19 @@ milestone is pushed independently; no empty commits or manufactured history.
 - [x] Bounded request bodies and per-tenant request admission
 - [x] Safe request correlation and bounded operational metrics
 - [x] Documented identity-provider configuration and trust boundaries (external provider drill remains deployment work)
-- [ ] Audited, bounded index-quarantine resolution without trusting poison data
-- [ ] Recovery tests covering retries, failures and audit preservation
-- [ ] Explicit retention decisions that preserve replay and forensic evidence
-- [ ] Independently labeled lexical relevance dataset and reproducible evaluation
-- [ ] Claim-extraction baseline with held-out labels and error analysis
-- [ ] No AI quality claim without measured comparison; no paid inference by default
-- [ ] Dependency readiness distinct from liveness
-- [ ] Reproducible, bounded load experiment with raw results and hardware metadata
-- [ ] Backup/restore drill against real PostgreSQL
-- [ ] Least-privilege database role verification
-- [ ] Non-root, pinned application packaging and vulnerability review
-- [ ] Operational runbooks, release checklist and current architecture narrative
+- [x] Audited, bounded index-quarantine source reconciliation without trusting poison data
+- [x] Recovery tests covering retries, failures and audit preservation
+- [x] Explicit retention decisions preserving evidence: indefinite local retention with hard admission caps; lifecycle automation remains open
+- [x] Separately authored synthetic relevance labels and reproducible actual-index evaluation (not external human annotation)
+- [x] Claim-extraction baseline with held-out labels and published error analysis
+- [x] No AI quality claim without measured comparison; no paid inference by default
+- [x] Dependency readiness distinct from liveness
+- [x] Bounded load experiment with 240 raw samples and hardware metadata; representative target still unproven
+- [x] Independent-container backup/restore drill against real PostgreSQL
+- [x] Restricted database runtime/operator role verification using a non-owner LOGIN
+- [x] Non-root, pinned application packaging and isolated HTTP smoke test
+- [ ] Finished-image vulnerability scan and review
+- [x] Operational runbooks and threat model
 - [ ] Full Java, console, dependency integration and CI regression on release HEAD
 
 Existing evidence remains in `validation/P4b.md` and earlier validation records.
@@ -55,5 +56,40 @@ Optional multi-node/cloud experiments are not local correctness evidence.
 10. Packaged authenticated feed test against PostgreSQL: own-scope reads/cancel,
     cross-tenant/merchant denials and exactly one authorized audit action pass.
     Corrected telemetry test resource cleanup; focused telemetry/JWT tests pass.
+11. Immutable quarantine reconciliation schema and documented source-trust boundary.
+12. Durable reconciliation engine: replay/idempotency, preserved history, finite retries.
+13. Exact-option operator CLI and recovery/retention runbook.
+14. Packaged reconciliation across JVM processes and real index tombstone evidence.
+15. Frozen synthetic development/holdout labels and graded ranking judgments.
+16. Corrected live-index evidence assertion (shadow-only helper was inappropriate).
+17. Bounded deterministic USD proposal extractor and exact evidence spans.
+18. Opt-in extraction API routes every proposal through source verification.
+19. Reproducible holdout and actual OpenSearch BM25 evaluation with tested metrics.
+20. Published all evaluation outputs, errors and experimental-mode decision.
+21. Configured-dependency readiness distinct from liveness, including outage test.
+22. Operator-only Prometheus endpoint, capped pressure gauges and incident runbook.
+23. Separate database capability groups, real-login restrictions and setup guide.
+24. Independent-container logical backup/restore with receipts, triggers and leases.
+25. Raw restore evidence and non-destructive recovery procedure.
+26. Successful-PIT-close capacity reclamation; uncertain acknowledgements retain bounds.
+27. CI superseded-run cancellation and exact-commit evidence artifacts.
+28. Explicit mixed-load experiment with bounded arrivals/concurrency and raw samples.
+29. Pinned non-root image, read-only local packaging and isolated HTTP smoke test.
+30. Published 200-search/40-update observation and explicit scale limitations.
+31. Immutable feed-control audit now records verified actor subject, never a caller-supplied label.
+32. Preserved feed semaphore admission before streaming upload bytes.
+
+Every numbered milestone above corresponds to a real commit after `1055653`;
+use `git log --reverse --oneline 1055653..HEAD` for exact hashes and dates.
+
+## Not silently converted into completed gates
+
+Representative 100k-offer/100-search-per-second/20-update-per-second testing,
+index-freshness percentiles, retention automation, distributed cursor/quota state,
+formal browser/screen-reader review, OTLP/collector/dashboard deployment, production
+OIDC/TLS/secrets/network setup, patched dependency images on every architecture,
+and production RPO/RTO/HA are not proved by this local release. The original spec
+is not “100% production-ready.” Public deployment and paid resources still need
+owner choices and authorization. Optional model work requires a new evaluation.
 
 Further entries are appended with the implemented behavior and focused evidence.
