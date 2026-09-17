@@ -4,7 +4,7 @@ Check whether a merchant offer is current and supported by its source facts.
 
 [![verify](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml/badge.svg)](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml)
 
-An incremental backend engineering project. **Durable merchant feeds flow through PostgreSQL and Kafka into search, which rechecks current source facts before returning verified offers.** This is a local development system, not a production deployment or a large-scale performance claim.
+A source-verification system with an evidence-first investigation console. **Durable merchant feeds flow through PostgreSQL and Kafka into search, which rechecks current source facts before returning verified offers.** This is a local development system, not a production deployment or a large-scale performance claim.
 
 ## Run it
 
@@ -46,6 +46,24 @@ against the packaged API. Feed ingestion and its worker are opt-in separately.
 
 Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full acceptance gate.
 
+### Investigation console
+
+The [React/TypeScript console](docs/CONSOLE.md) provides verified search, source/index
+evidence, bounded feed uploads, durable row receipts and explicit recovery actions.
+It uses the existing API; no browser-side verification or fabricated fallback data.
+
+```sh
+cd console
+# Node 22.22.2; scoped npm version avoids changing your global installation
+npx --yes npm@11.11.0 ci --no-fund
+npm run dev
+```
+
+Open the printed loopback URL. Start the search/feed-enabled backend using the
+[console runbook](docs/CONSOLE.md) for real data. Frontend checks (`npm run check`)
+need no Docker. The isolated `npm run test:integration` walkthrough requires the
+packaged Java jar and Docker; it cleans up only its synthetic test stack.
+
 ## What works today
 
 - Versioned offer ingestion with identical replay, conflicting/older-version rejection and deterministic claim verification.
@@ -59,15 +77,17 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Replay-safe OpenSearch indexing with external versions, retained tombstones, durable poison-event quarantine and manual Kafka offset commits.
 - Tenant-filtered lexical search with bounded PostgreSQL batch verification, as-of provenance and stale-candidate rejection on every page.
 - Stable PIT/search-after pagination through refreshes and alias handoffs, with signed short-lived cursors, cancellation and bounded resource admission. Cursors are process-local, not HA state. See the [pagination guide](docs/PAGINATION.md).
+- Local React console with lossless money/version evidence, explicit snapshot expiry, empty-page continuation, exact-byte upload retries and scoped feed investigation. Native forms/dialogs, visible keyboard focus and responsive layouts; no background polling or invented dashboard metrics.
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
 - Coordinated rebuild with topic-identity/retention checks, source-validated Kafka catch-up, durable indexing pause and atomic alias handoff. Interrupted switches reconcile forward; unsafe rollback is refused.
 - 134 passing tests, including actual database/broker/index integration, atomic feed rollback, forced worker restart, full feed-to-search delivery, stable pagination and interrupted index handoff recovery. See [feed evidence](docs/validation/P4a.md), [pagination evidence](docs/validation/P3c3.md) and [handoff evidence](docs/validation/P3c2b.md).
+- 37 console tests plus a real-API React walkthrough covering mixed feed receipts, idempotent recovery, verified pagination and source-deletion exclusion. See [console acceptance evidence and visual-review limits](docs/validation/P4b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
 ## Next phases — not yet implemented
 
-React search/feed-investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
+Optional Python claim extraction follows an independently evaluated deterministic baseline. Real-browser visual/accessibility review remains separate from automated DOM checks and the real-API React walkthrough.
 
 Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
 
@@ -82,6 +102,7 @@ Publishing, indexing and search are disabled unless explicitly enabled under the
 - [Search projection decisions](docs/adr/0004-search-projection.md) and [validation](docs/validation/P3c1.md)
 - [P2 validation evidence](docs/validation/P2.md) and [historical P1 record](docs/validation/P1.md)
 - [Optional companion-project integration](docs/INTEGRATION.md)
+- [Investigation console runbook](docs/CONSOLE.md) and [client-boundary decisions](docs/adr/0009-investigation-console.md)
 
 The companion project is [Inventory Reservation & Fulfillment](https://github.com/sontiachyut/inventory-fulfillment). Each repository runs independently.
 

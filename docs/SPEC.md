@@ -18,7 +18,8 @@ signed cursors and authoritative verification on every page. The local API now
 supports this contract; cursors expire on process restart and are not HA state.
 P4a clarification: ADR 0008 defines implemented bounded NDJSON admission,
 immutable feed provenance, durable row receipts, fenced workers and tested
-restart/retry/cancel behavior. The P4b UI remains a separate acceptance gate.
+restart/retry/cancel behavior. ADR 0009 adds the P4b local React investigation
+console, preserving the same authority, scope and deployment restrictions.
 
 ## Product and boundaries
 

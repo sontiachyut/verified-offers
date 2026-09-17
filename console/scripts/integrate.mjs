@@ -33,7 +33,13 @@ let appOutput = '';
 let port;
 const command = (binary, args, options = {}) =>
   new Promise((resolve, reject) => {
-    const child = spawn(binary, args, { cwd: root, env, stdio: 'inherit', ...options });
+    const child = spawn(binary, args, {
+      cwd: root,
+      env,
+      stdio: 'inherit',
+      timeout: 180_000,
+      ...options,
+    });
     child.once('error', reject);
     child.once('exit', (code) =>
       code === 0 ? resolve() : reject(new Error(`${binary} exited with ${code}`)),
@@ -59,7 +65,7 @@ try {
   console.log('Starting isolated synthetic dependencies; no existing project is reused.');
   await command('docker', ['info', '--format', '{{.ServerVersion}}']);
   started = true;
-  await command('docker', [...compose, 'up', '-d', '--wait', '--wait-timeout', '120']);
+  await command('docker', [...compose, 'up', '-d', '--wait']);
   if (interrupted) throw new Error('Interrupted.');
   await command('docker', [
     ...compose,

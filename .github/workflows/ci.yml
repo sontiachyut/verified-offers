@@ -36,5 +36,11 @@ jobs:
       - run: ./mvnw --batch-mode --no-transfer-progress verify
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '22'
+          node-version: '22.22.2'
+          cache: npm
+          cache-dependency-path: console/package-lock.json
       - run: node scripts/demo.mjs
+      - run: npx --yes npm@11.11.0 ci --no-fund
+        working-directory: console
+      - run: npm run test:integration
+        working-directory: console

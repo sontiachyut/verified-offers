@@ -361,6 +361,8 @@ time {
   margin: 0 0 8px;
 }
 .section-heading h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   align-items: center;
   gap: 8px;

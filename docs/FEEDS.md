@@ -3,7 +3,8 @@
 P4a local backend: upload a bounded NDJSON file, inspect durable per-row progress,
 and recover work after worker failure. Synthetic data only, loopback-only and
 unauthenticated. Tenant/merchant path parameters are scope, not authentication.
-The UI, production identity/roles, retention and load experiments remain separate.
+The [local investigation console](CONSOLE.md) wraps these APIs. Production
+identity/roles, retention and load experiments remain separate.
 
 ## Start explicitly
 
@@ -173,5 +174,5 @@ capacity in a database containing wanted work.
 See [ADR 0008](adr/0008-durable-merchant-feeds.md) and
 [acceptance evidence](validation/P4a.md). Tests use isolated databases and actual
 packaged JVMs, including a forced worker kill. Production auth, role separation,
-image remediation, restore drills, representative load and the React UI are not
-completed by this backend slice.
+image remediation, restore drills and representative load are not completed by
+this backend slice. The React client is documented separately in CONSOLE.md.

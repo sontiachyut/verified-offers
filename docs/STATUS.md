@@ -19,35 +19,35 @@ Last updated: 2026-09-16
 - P3c3: bounded PIT/search-after pages, deterministic ordering, signed process-local cursors, current PostgreSQL verification on every page, cancellation and fixed expiry. Real index refresh/handoff/outage and packaged HTTP/restart tests pass. See [ADR 0007](adr/0007-stable-search-pages.md), [guide](PAGINATION.md) and [evidence](validation/P3c3.md).
 - P4a: bounded UTF-8 NDJSON admission with exact-byte checksum/idempotency, immutable provenance, durable per-row results and atomic catalog/outbox/receipt commits. Fenced workers, retry pause, scoped audited retry/cancel, HTTP/CLI progress and forced-process restart recovery are tested. See [ADR 0008](adr/0008-durable-merchant-feeds.md), [walkthrough](FEEDS.md) and [evidence](validation/P4a.md).
 - The mixed synthetic example is tested through the packaged API; old source facts remain stale. The complete feed → PostgreSQL outbox → Kafka → verified search flow passes against real dependencies. Feed completion itself does not promise downstream search visibility.
+- P4b local functional implementation: React/TypeScript console for verified search and feed investigation. Includes frozen cursor scope/expiry, exact source/index evidence, bounded exact-byte uploads, safe idempotent recovery, paginated jobs/receipts and confirmed retry/cancel actions. See [console runbook](CONSOLE.md), [ADR 0009](adr/0009-investigation-console.md) and [evidence](validation/P4b.md).
+- 37 focused console tests, DOM accessibility checks, TypeScript, formatting and bundle build pass. One additional real-API React walkthrough passes through Vite → packaged Java → PostgreSQL/Kafka/OpenSearch, including upload replay, row evidence, search continuation and source deletion. No fake backend fallback or public hosting was added.
 - 59 unit/HTTP/helper plus 75 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (134 total). The four-assertion HTTP demo also passes. Feed milestones separately passed 54 unit, 124 full and 133 full tests before the final example gate. No benchmark or production readiness is implied.
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: P4b search/feed investigation UI
+## Exact next task: browser review, then choose the next operational gate
 
-P4b in progress: `console/` now has the local React/Vite search workspace,
-lossless integer evidence, frozen cursor scope, explicit expiry/retry, and
-best-effort abandoned-search release. Ten interaction/API tests and TypeScript
-checks passed at the first milestone. Feed upload, job/row/action views and
-confirmations are now implemented. The expanded 37-test console suite, DOM
-accessibility checks, formatting, TypeScript and build pass; real-API walkthrough
-and final backend regression are the remaining acceptance checks. See ADR 0009.
+P4a/P4b local functional gates now pass. Finish a connected-browser visual pass
+when available and approved: narrow/desktop viewport, contrast, native file
+selection, keyboard navigation and native dialog focus trapping. No browser was
+connected for this session; do not claim this review or full accessibility
+certification was performed. Automated DOM/keyboard and real-API interaction
+evidence is recorded separately in validation/P4b.md.
 
-P4a backend acceptance is complete; the combined P4 phase remains open for its UI.
-Define a small accessible React/TypeScript console around existing contracts:
-verified search with provenance/as-of evidence, cursor expiry/continuation and
-empty-page behavior; bounded feed upload; job/row progress and fixed errors;
-explicit retry/cancel confirmations and visible partial-commit semantics.
-Keep tenant scope labeled as unauthenticated local demo scope. Do not create a
-second authority for verification in the browser. Test loading/empty/error states,
-keyboard accessibility and an end-to-end synthetic walkthrough. No public hosting
-or real data without the existing security/deployment approval gates.
-Audited index-quarantine replay/retention remains an open operational gate.
+The final local backend regression again passed all 134 tests with zero
+failures/errors/skips, followed by the four-assertion HTTP demo. Console checks
+run with one worker; heavy checks ran sequentially. The integration harness
+removed only its own disposable synthetic stack. No public hosting or real data
+without the existing security/deployment approval gates.
+
+After visual review, select a bounded next slice: audited index-quarantine
+replay/retention or P5 authentication and tenant isolation before any shared
+runtime. Optional AI evaluation remains later work, not an implemented claim.
 
 ## Explicit limits / open decisions
 
 - postgres-local persists state; local-demo remains volatile. Both profiles are unauthenticated and loopback-only. No real data or public exposure.
-- Publishing, search, indexing and feeds are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Feed background processing has its own enable flag. No UI or model integration yet.
+- Publishing, search, indexing and feeds are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Feed background processing has its own enable flag. The local console wraps these APIs; no model integration yet.
 - Images require security remediation/review: see [database scan](validation/IMAGE-SECURITY.md), [Kafka scan](validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch scan](validation/OPENSEARCH-IMAGE-SECURITY.md). Re-scan, production database roles, auth, restore drills and cloud sizing/cost remain deployment gates.
 - Correctness tests are not throughput, uptime, failover or representative scale measurements.
 - No billable cloud resources were created. The seven-session sprint is a planning aid, not a completeness promise.
@@ -55,4 +55,4 @@ Audited index-quarantine replay/retention remains an open operational gate.
 - All live indexers must run the gate-aware build. Mixed versions, foreign/transactional/compacted topic writers and manual concurrent alias administration are unsupported. A pause survives crashes; SWITCHING recovers forward, never by blind rollback. Retention loss during an uncertain switch can require reviewed repair.
 - Search cursors are process-local, fixed at two minutes and invalid after restart. At most 128 reservations and eight in-flight page operations per process; completed/failed searches retain admission reservations for the expiry plus ten-second grace. This is a conservative local bound, not an HA/distributed quota or capacity result.
 - Feeds are bounded at 1 MiB/1,000 rows/4 KiB per line, four concurrent uploads per process, 100 retained jobs globally and 20 operator actions per job. Immutable provenance/receipts are retained; no cleanup endpoint exists. Retry/cancel are unauthenticated local-operator actions, not an auth audit. Cancellation never undoes committed rows.
-- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0008.
+- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0009.

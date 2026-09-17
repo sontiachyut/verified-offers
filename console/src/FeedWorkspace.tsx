@@ -474,6 +474,7 @@ function JobDetail({
     return () => onBusy(false);
   }, [mutating, onBusy]);
   const [controlError, setControlError] = useState<unknown>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const epoch = useRef(0);
   const base = feedUrl(scope, id);
   async function refresh() {
@@ -501,6 +502,7 @@ function JobDetail({
     }
   }
   useEffect(() => {
+    heading.current?.focus();
     void refresh();
     return () => {
       epoch.current++;
@@ -519,7 +521,10 @@ function JobDetail({
           nextAfter: next.nextAfter,
         }));
     } catch (failure) {
-      if (token === epoch.current) setError(failure);
+      if (token === epoch.current) {
+        setError(failure);
+        setFresh(false);
+      }
     } finally {
       if (token === epoch.current) setBusy(false);
     }
@@ -538,6 +543,7 @@ function JobDetail({
       });
       setControl(null);
       await refresh();
+      heading.current?.focus();
     } catch (failure) {
       setControlError(failure);
     } finally {
@@ -551,7 +557,9 @@ function JobDetail({
         Back to loaded jobs
       </button>
       <div className="section-heading job-heading">
-        <h2>Job investigation</h2>
+        <h2 ref={heading} tabIndex={-1}>
+          Job investigation
+        </h2>
         <button disabled={busy || mutating} onClick={() => void refresh()}>
           <RefreshCw size={14} />
           Refresh job
