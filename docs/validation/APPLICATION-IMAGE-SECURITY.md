@@ -18,8 +18,26 @@ The application overrides Spring Boot 4.1.1's Tomcat BOM version with **11.0.26*
 The 11.0.25 security fixes are included in that later patch release. The official
 [security advisory](https://tomcat.apache.org/security-11) and
 [11.0.26 changelog](https://tomcat.apache.org/tomcat-11.0-doc/changelog.html) were
-checked before updating. Real HTTP/JWT tests run against 11.0.26; final complete
-regression, packaged-container smoke and post-patch image scan remain required.
+checked before updating. The complete regression passed against 11.0.26:
+101 unit/HTTP/helper and 85 real-dependency/process tests, zero failures/errors/
+skips. The rebuilt container also passed non-root/read-only runtime checks and
+actual ingest/verify/conflict HTTP assertions.
+
+## Post-patch observation
+
+The [post-patch sanitized report](application-image-scan-after.json) records
+the exact rebuilt image ID, timestamp and all remaining findings. The same
+digest-pinned scanner reported:
+
+| Application image | Critical | High | Medium | Low |
+|---|---:|---:|---:|---:|
+| Tomcat 11.0.24, before | 3 | 0 | 53 | 16 |
+| Tomcat 11.0.26, after | 0 | 0 | 53 | 16 |
+
+The three critical package findings no longer appear; no findings were suppressed.
+The 69 remaining medium/low occurrences still require exposure review before
+deployment. This is a point-in-time linux/arm64 result, not a vulnerability-free
+claim, application penetration test or approval for public use.
 
 ## Reproduce without exposing the Docker socket
 

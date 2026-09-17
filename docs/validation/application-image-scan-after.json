@@ -1,0 +1,635 @@
+{
+  "scannedAt": "2026-09-17T03:31:46.936Z",
+  "image": "verified-offers:local",
+  "platform": "arm64",
+  "scanner": "trivy:0.74.0",
+  "imageId": "sha256:55fb2adbf8714e64cd2090b868bf0f815e7e407b21c8d94de3bf6573f5c9daa3",
+  "counts": {
+    "MEDIUM": 53,
+    "LOW": 16
+  },
+  "findings": [
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18924",
+      "package": "curl",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18924"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-19931",
+      "package": "curl",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-19931"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-80230",
+      "package": "curl",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-80230"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-82209",
+      "package": "curl",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-82209"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2022-27943",
+      "package": "gcc-12-base",
+      "installed": "12.3.0-1ubuntu1~22.04.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2022-27943"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18374",
+      "package": "libc-bin",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18374"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-19542",
+      "package": "libc-bin",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-19542"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-6368",
+      "package": "libc-bin",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-6368"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-6791",
+      "package": "libc-bin",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-6791"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-77117",
+      "package": "libc-bin",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-77117"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-80489",
+      "package": "libc-bin",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-80489"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18374",
+      "package": "libc6",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18374"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-19542",
+      "package": "libc6",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-19542"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-6368",
+      "package": "libc6",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-6368"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-6791",
+      "package": "libc6",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-6791"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-77117",
+      "package": "libc6",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-77117"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-80489",
+      "package": "libc6",
+      "installed": "2.35-0ubuntu3.14",
+      "fixed": "2.35-0ubuntu3.15",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-80489"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18924",
+      "package": "libcurl4",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18924"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-19931",
+      "package": "libcurl4",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-19931"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-80230",
+      "package": "libcurl4",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-80230"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-82209",
+      "package": "libcurl4",
+      "installed": "7.81.0-1ubuntu1.27",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-82209"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2025-59375",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2025-59375"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2025-66382",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2025-66382"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-32776",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-32776"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-32777",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-32777"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-32778",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-32778"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-41080",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-41080"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-45186",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-45186"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-50219",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-50219"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56131",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56131"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56132",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56132"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56403",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56403"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56404",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56404"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56405",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56405"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56406",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56406"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56407",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56407"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56408",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56408"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56409",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56409"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56410",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56410"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56411",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56411"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-56412",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-56412"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-66046",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-66046"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-72522",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-72522"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-76641",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-76641"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-76957",
+      "package": "libexpat1",
+      "installed": "2.4.7-1ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-76957"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2022-27943",
+      "package": "libgcc-s1",
+      "installed": "12.3.0-1ubuntu1~22.04.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2022-27943"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-50495",
+      "package": "libncurses6",
+      "installed": "6.3-2ubuntu0.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-50495"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-50495",
+      "package": "libncursesw6",
+      "installed": "6.3-2ubuntu0.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-50495"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2022-41409",
+      "package": "libpcre2-8-0",
+      "installed": "10.39-3ubuntu0.1",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2022-41409"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-39113",
+      "package": "libsqlite3-0",
+      "installed": "3.37.2-2ubuntu0.7",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-39113"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2022-27943",
+      "package": "libstdc++6",
+      "installed": "12.3.0-1ubuntu1~22.04.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2022-27943"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-40228",
+      "package": "libsystemd0",
+      "installed": "249.11-0ubuntu3.22",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-40228"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-50495",
+      "package": "libtinfo6",
+      "installed": "6.3-2ubuntu0.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-50495"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-40228",
+      "package": "libudev1",
+      "installed": "249.11-0ubuntu3.22",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-40228"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2022-4899",
+      "package": "libzstd1",
+      "installed": "1.4.8+dfsg-3build1",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2022-4899"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18374",
+      "package": "locales",
+      "installed": "2.35-0ubuntu3.15",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18374"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-29383",
+      "package": "login",
+      "installed": "1:4.8.1-2ubuntu2.2",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-29383"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2024-56433",
+      "package": "login",
+      "installed": "1:4.8.1-2ubuntu2.2",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2024-56433"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-50495",
+      "package": "ncurses-base",
+      "installed": "6.3-2ubuntu0.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-50495"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-50495",
+      "package": "ncurses-bin",
+      "installed": "6.3-2ubuntu0.3",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-50495"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2023-29383",
+      "package": "passwd",
+      "installed": "1:4.8.1-2ubuntu2.2",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2023-29383"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2024-56433",
+      "package": "passwd",
+      "installed": "1:4.8.1-2ubuntu2.2",
+      "fixed": null,
+      "severity": "LOW",
+      "url": "https://avd.aquasec.com/nvd/cve-2024-56433"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-15534",
+      "package": "perl-base",
+      "installed": "5.34.0-3ubuntu1.8",
+      "fixed": "5.34.0-3ubuntu1.9",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-15534"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-19487",
+      "package": "perl-base",
+      "installed": "5.34.0-3ubuntu1.8",
+      "fixed": "5.34.0-3ubuntu1.9",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-19487"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18477",
+      "package": "tar",
+      "installed": "1.34+dfsg-1ubuntu0.1.22.04.6",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18477"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-18508",
+      "package": "tar",
+      "installed": "1.34+dfsg-1ubuntu0.1.22.04.6",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-18508"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2021-31879",
+      "package": "wget",
+      "installed": "1.21.2-2ubuntu1.5",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2021-31879"
+    },
+    {
+      "target": "/scan/image.tar (ubuntu 22.04)",
+      "id": "CVE-2026-85091",
+      "package": "zlib1g",
+      "installed": "1:1.2.11.dfsg-2ubuntu9.2",
+      "fixed": null,
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-85091"
+    },
+    {
+      "target": "Java",
+      "id": "CVE-2026-59949",
+      "package": "at.yawk.lz4:lz4-java",
+      "installed": "1.10.1",
+      "fixed": "1.11.1",
+      "severity": "MEDIUM",
+      "url": "https://avd.aquasec.com/nvd/cve-2026-59949"
+    }
+  ],
+  "limitations": "Point-in-time package findings, not exploitability assessment or production approval."
+}

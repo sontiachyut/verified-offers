@@ -24,7 +24,7 @@ milestone is pushed independently; no empty commits or manufactured history.
 - [x] Independent-container backup/restore drill against real PostgreSQL
 - [x] Restricted database runtime/operator role verification using a non-owner LOGIN
 - [x] Non-root, pinned application packaging and isolated HTTP smoke test
-- [ ] Finished-image vulnerability scan and review
+- [x] Finished-image vulnerability scan and documented remediation/review; remaining findings are not waived
 - [x] Operational runbooks and threat model
 - [ ] Full Java, console, dependency integration and CI regression on release HEAD
 

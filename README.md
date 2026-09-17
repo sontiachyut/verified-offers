@@ -118,7 +118,9 @@ production identity/TLS/network/secret setup, retention lifecycle beyond local
 admission caps, HA and deployment review remain open. The pinned
 [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md)
 and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images have recorded
-vulnerability findings; pinned does not mean safe. See the [threat model](docs/THREAT-MODEL.md).
+vulnerability findings; pinned does not mean safe. The finished application image
+was [scanned and patched](docs/validation/APPLICATION-IMAGE-SECURITY.md), with
+before/after reports and remaining findings published. See the [threat model](docs/THREAT-MODEL.md).
 Public deployment is not approved.
 
 ## Engineering documents
