@@ -10,7 +10,10 @@ The fixed synthetic workload uses 250 offers, 10 merchants, seed identifier
 at most two requests in flight. Five searches warm up the path. Initial catalog
 and projection are bootstrapped offline (excluded from timing); measured updates
 go through the actual HTTP → PostgreSQL outbox → Kafka → index pipeline.
-Unauthenticated local mode; no identity-provider performance claim.
+Unauthenticated local mode; no identity-provider performance claim. Every search
+uses the same `keyboard` query and limit 10; updates target distinct sequential
+offer IDs. This intentionally simple workload is not diverse query traffic or a
+hot-key/skew experiment, and cache effects are part of the observation.
 
 | Operation | Successful / attempted | p50 | p95 | p99 |
 | --- | --- | --- | --- | --- |

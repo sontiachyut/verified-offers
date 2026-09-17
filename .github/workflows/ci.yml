@@ -58,3 +58,7 @@ jobs:
         working-directory: console
       - run: npm run test:integration
         working-directory: console
+      - name: Build and exercise the non-root local application image
+        run: |
+          docker build --tag verified-offers:local .
+          node scripts/container-smoke.mjs
