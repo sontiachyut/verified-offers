@@ -1,71 +1,86 @@
 # Current status
 
-Last updated: 2026-09-16
+Last updated: 2026-09-16 (local time).
 
-## Completed
+## Implemented and evidenced
 
-- P5 security slice: opt-in RS256 JWT resource server, verified tenant/merchant scope,
-  separate read/write/operator permissions, bounded request bodies and tenant budgets,
-  safe request correlation. Signed HTTP tests and packaged PostgreSQL feed-isolation
-  test pass. See [authentication](AUTHENTICATION.md) and [release ledger](COMPLETION.md).
+- P0–P4: specification, Java API/reference model, PostgreSQL immutable source/history
+  and transactional outbox, Kafka delivery, replay-safe OpenSearch, stable verified
+  pagination, resumable rebuild/handoff, durable merchant feeds and React console.
+  Earlier acceptance records remain in `docs/validation/P1.md` through `P4b.md`.
+- P5 security: opt-in RS256 JWT issuer/audience/time validation, token-derived tenant
+  and merchant authorization, separate scopes, bounded request bodies and tenant
+  budgets, safe errors/logs, verified actor attribution on immutable feed actions.
+  Real signed HTTP and packaged PostgreSQL isolation tests pass. See
+  [authentication](AUTHENTICATION.md) and [threat model](THREAT-MODEL.md).
+- P5 baseline evaluation: separately authored synthetic ranking judgments and
+  claim development/holdout labels. Actual OpenSearch BM25 nDCG@10 0.87649,
+  Recall@10 0.875 on 12 queries. Claim baseline precision 0.80, recall 0.7273,
+  with two false proposals; experimental extraction remains OFF by default.
+  All raw outputs and error analysis are [published](EVALUATION.md).
+- Audited source reconciliation for index quarantine: immutable operator intent,
+  saved source version, eight-attempt bound, gate-aware projection and safe replay
+  across processes. This is NOT arbitrary raw-event/schema repair. Original
+  quarantine evidence is preserved. See [runbook](QUARANTINE.md).
+- P6 local operational evidence: dependency readiness distinct from liveness,
+  protected Prometheus endpoint, capped pressure metrics, tested restricted
+  database roles, independent-container logical restore, and pinned non-root
+  read-only application packaging with an actual HTTP smoke test.
+- Bounded mixed workload: 250 offers/10 merchants, 200 searches and 40 updates in
+  20s, two requests in flight, no observed failures/drops; search-plus-close
+  p95 38.18ms on Apple M4/16GiB. This is not the proposed large-scale target or
+  a freshness percentile measurement. See [raw load evidence](LOAD.md).
+- Successful confirmed PIT deletion now reclaims admission early. Failed/unknown
+  opens or deletion acknowledgements retain their expiry/grace reservations,
+  preserving the leak bound. Regression includes real-index pagination.
+- The owner accepted the UI appearance. Formal viewport/contrast/native browser/
+  screen-reader certification is not claimed. The 38 DOM/interaction tests and
+  real-API React walkthrough remain separate evidence.
+- More than 30 real commits and individual pushes since `1055653`; see the
+  [release ledger](COMPLETION.md). No backdating or empty commit padding.
 
-- P0: specification, invariants, APIs, security gates, capacity methodology and acceptance-gated roadmap.
-- P1: Java 21/Spring Boot 4.1.1 local reference model, HTTP API, Maven wrapper, CI and synthetic demonstration.
-- P2: PostgreSQL 17.11, Flyway migrations, JDBC adapter and atomic transactional outbox. The in-memory adapter remains separately available.
-- P3a: PostgreSQL delivery leases, transport-independent outbox relay, bounded retries, quarantine and atomic audited replay. See [delivery decisions](adr/0003-outbox-delivery.md) and [runbook](OUTBOX.md).
-- P3b: acknowledged Kafka 4.2.1 adapter and opt-in Spring-managed publisher with bounded polling/I/O, result counters and graceful shutdown. Real broker pause/recovery and acknowledgement-gap replay tests pass.
-- Opt-in Compose broker and [Kafka runbook](KAFKA.md) exercised end to end: API ingest → Kafka console consumption → PostgreSQL publication record, using an isolated synthetic Compose project. Three partitions, seven-day retention and loopback port bindings verified.
-- P3c1: OpenSearch 3.8.0 external-version projection, retained tombstones, explicit write alias, Kafka indexing worker and durable poison quarantine. Top-N lexical search rechecks an authoritative PostgreSQL batch and fails closed on stale facts or index outages. See [ADR 0004](adr/0004-search-projection.md).
-- The opt-in Compose search profile and [walkthrough](SEARCH.md) were exercised on an isolated synthetic stack: verified version 1, disabled indexer plus price-change rejection, same-group restart/catch-up to version 2, immediate authoritative deletion rejection, and three graceful API shutdowns.
-- P3c2a core: durable PostgreSQL snapshot references, bounded/leased shadow rebuilding, crash-safe replay, write-blocked full-content/version/count validation. The live alias is untouched. See [ADR 0005](adr/0005-resumable-shadow-rebuild.md) and [evidence](validation/P3c2a.md).
-- Packaged snapshot-only create/step/status commands resume across JVM processes and force web/publisher/indexer/search off, even when inherited flags enable them. See the [snapshot runbook](REBUILD.md). These original jobs remain nonpromotable.
-- P3c2b: pre-snapshot Kafka topic/offset boundary, durable live-indexer pause, bounded source-validated replay, separately validated candidate, atomic alias handoff and forward reconciliation after a lost acknowledgement. Safe pre-switch abort is available; post-switch rollback is refused. See [ADR 0006](adr/0006-coordinated-index-handoff.md).
-- Coordinated begin/step/status/abort commands work across packaged JVM restarts, including inherited-worker override protection. See the [handoff runbook](HANDOFF.md). This uses an indexing pause, not zero-downtime cutover.
-- P3c3: bounded PIT/search-after pages, deterministic ordering, signed process-local cursors, current PostgreSQL verification on every page, cancellation and fixed expiry. Real index refresh/handoff/outage and packaged HTTP/restart tests pass. See [ADR 0007](adr/0007-stable-search-pages.md), [guide](PAGINATION.md) and [evidence](validation/P3c3.md).
-- P4a: bounded UTF-8 NDJSON admission with exact-byte checksum/idempotency, immutable provenance, durable per-row results and atomic catalog/outbox/receipt commits. Fenced workers, retry pause, scoped audited retry/cancel, HTTP/CLI progress and forced-process restart recovery are tested. See [ADR 0008](adr/0008-durable-merchant-feeds.md), [walkthrough](FEEDS.md) and [evidence](validation/P4a.md).
-- The mixed synthetic example is tested through the packaged API; old source facts remain stale. The complete feed → PostgreSQL outbox → Kafka → verified search flow passes against real dependencies. Feed completion itself does not promise downstream search visibility.
-- P4b local functional implementation: React/TypeScript console for verified search and feed investigation. Includes frozen cursor scope/expiry, exact source/index evidence, bounded exact-byte uploads, safe idempotent recovery, paginated jobs/receipts and confirmed retry/cancel actions. See [console runbook](CONSOLE.md), [ADR 0009](adr/0009-investigation-console.md) and [evidence](validation/P4b.md).
-- 38 focused console tests, DOM accessibility checks, TypeScript, formatting and bundle build pass. One additional real-API React walkthrough passes through Vite → packaged Java → PostgreSQL/Kafka/OpenSearch, including upload replay, row evidence, search continuation and source deletion. No fake backend fallback or public hosting was added.
-- 59 unit/HTTP/helper plus 75 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (134 total). The four-assertion HTTP demo also passes. Feed milestones separately passed 54 unit, 124 full and 133 full tests before the final example gate. No benchmark or production readiness is implied.
-- Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
-- CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
+## Current verification checkpoint
 
-## Current task: finish remaining local release gates
+A full local regression passed 100 unit/HTTP/helper tests plus 85 real-dependency/
+process tests (185 total, zero failures/errors/skips) before the final actor-audit
+and streaming-admission hardening. The subsequent focused JWT/feed/admission
+regression passed with Flyway V8. Final full regression, image vulnerability scan,
+console checks and exact-HEAD CI must be recorded before release handoff.
+Heavy local checks run sequentially with bounded JVMs; no paid infrastructure.
 
-The owner accepted the UI appearance and requested continued implementation with
-at least 30 substantive commit/push milestones. Follow `COMPLETION.md`: security,
-audited quarantine recovery, evaluation, restore/load evidence and packaging.
-No public deployment, paid infrastructure or production-readiness claim is implied.
-The historical P4 evidence below remains valid for its recorded revision.
+## Exact next gate
 
-P4a/P4b local functional gates now pass. Finish a connected-browser visual pass
-when available and approved: narrow/desktop viewport, contrast, native file
-selection, keyboard navigation and native dialog focus trapping. No browser was
-connected for this session; do not claim this review or full accessibility
-certification was performed. Automated DOM/keyboard and real-API interaction
-evidence is recorded separately in validation/P4b.md.
+Finish the final verification/scan evidence and synchronize the release checklist.
+Do not mark the original specification 100% production-ready based on these
+local functional results. If the owner wants deployment or representative-scale
+testing, obtain environment/cost/security choices first.
 
-The final local backend regression again passed all 134 tests with zero
-failures/errors/skips, followed by the four-assertion HTTP demo. Console checks
-run with one worker; heavy checks ran sequentially. The integration harness
-removed only its own disposable synthetic stack. No public hosting or real data
-without the existing security/deployment approval gates.
+## Operational boundaries
 
-After visual review, select a bounded next slice: audited index-quarantine
-replay/retention or P5 authentication and tenant isolation before any shared
-runtime. Optional AI evaluation remains later work, not an implemented claim.
-
-## Explicit limits / open decisions
-
-- postgres-local persists state; local-demo remains volatile. Both are loopback-only
-  and unauthenticated by default; opt-in JWT mode is documented in AUTHENTICATION.md.
-  No real data or public exposure.
-- Publishing, search, indexing and feeds are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Feed background processing has its own enable flag. The local console wraps these APIs; no model integration yet.
-- Images require security remediation/review: see [database scan](validation/IMAGE-SECURITY.md), [Kafka scan](validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch scan](validation/OPENSEARCH-IMAGE-SECURITY.md). Re-scan, production database roles, auth, restore drills and cloud sizing/cost remain deployment gates.
-- Correctness tests are not throughput, uptime, failover or representative scale measurements.
-- No billable cloud resources were created. The seven-session sprint is a planning aid, not a completeness promise.
-- Shadow snapshots are capped at 100,000 offers and ten retained jobs; a successful handoff uses two jobs. Replay is capped at 10,000 offsets and 32 partitions. Cleanup/retention is not implemented. SNAPSHOT_VALIDATED alone is not promotion approval.
-- All live indexers must run the gate-aware build. Mixed versions, foreign/transactional/compacted topic writers and manual concurrent alias administration are unsupported. A pause survives crashes; SWITCHING recovers forward, never by blind rollback. Retention loss during an uncertain switch can require reviewed repair.
-- Search cursors are process-local, fixed at two minutes and invalid after restart. At most 128 reservations and eight in-flight page operations per process; completed/failed searches retain admission reservations for the expiry plus ten-second grace. This is a conservative local bound, not an HA/distributed quota or capacity result.
-- Feeds are bounded at 1 MiB/1,000 rows/4 KiB per line, four concurrent uploads per process, 100 retained jobs globally and 20 operator actions per job. Immutable provenance/receipts are retained; no cleanup endpoint exists. Retry/cancel are unauthenticated local-operator actions, not an auth audit. Cancellation never undoes committed rows.
-- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0009.
+- `postgres-local` is durable; `local-demo` is volatile. Both are loopback-only
+  and unauthenticated by default. JWT mode is optional, not a production provider
+  integration. The console is still a local demo client, not an OIDC login UI.
+- Publishing/search/indexing/feeds and background feed work are separately opt-in.
+  Extraction is experimental and separately opt-in; no paid model integration.
+- Images have documented vulnerability findings. Finished-app and dependency
+  scans are point-in-time/platform-specific; pinned images are not clean-image
+  or exploitability claims. Public deployment is not approved.
+- Retain source versions, tombstones, outbox/feed/quarantine/audit evidence
+  indefinitely in this bounded reference system. No destructive cleanup is
+  implemented. Feeds retain 100 jobs globally and 20 actions/job; snapshots retain
+  ten jobs with 100k offers/job. These caps are not an unbounded production
+  lifecycle policy. A reviewed archival design remains future work.
+- Search state/cursor keys and quotas are process-local, not HA. Eight page
+  operations and 128 unresolved reservations; fixed two-minute cursor lifetime.
+  Only acknowledged PIT deletion releases reservations before the grace deadline.
+- Handoffs require gate-aware indexers, at most 10k replay offsets/32 partitions,
+  no foreign/transactional/compacted writers or concurrent manual alias changes.
+  SWITCHING recovers forward; do not blindly roll back.
+- Database roles are tested but not applied automatically to the simple local
+  profile. Production credentials, TLS, network isolation, rotation, encrypted
+  off-site backup/PITR and measured RPO/RTO remain deployment work.
+- Representative 100k-offer/100-search-per-second/20-update-per-second testing,
+  freshness percentiles, HA, OTLP/collector/dashboard deployment and formal
+  browser/accessibility review remain open. The laptop run does not replace them.
+- No cloud resources or external messages were created. Resume using this file,
+  ROADMAP.md, COMPLETION.md and ADRs 0010–0012 plus the relevant earlier ADR.

@@ -80,17 +80,18 @@ acknowledge deletion, its fixed expiry is the fallback; no lifetime is extended.
   backend context was lost. A temporary outage can be retried with the same
   cursor before expiry; the server never opens a replacement PIT for that cursor.
 
-The local API admits at most 128 snapshot reservations per process and eight
-in-flight requests. Reservations are retained for two minutes plus ten seconds
-of I/O grace even after completion or an uncertain open/close failure. Thus fast
-repeated searches can receive 429 despite no visible open PITs. This conservative
-local bound prevents unbounded context churn when replies are lost; it is not a
-measured production throughput policy. Waiting for reservation expiry needs no
-background worker. Abandoned backend PITs expire without renewal.
+The local API admits at most 128 unresolved snapshot reservations per process and
+eight in-flight requests. Confirmed successful backend PIT deletion releases its
+reservation early. Failed/partial/unknown deletion or open acknowledgements retain
+the reservation for two minutes plus ten seconds of I/O grace, so repeated failures
+can still produce 429 despite no visible PITs. HTTP 200 alone is insufficient:
+every requested PIT ID must have an explicit successful deletion acknowledgement.
+Abandoned backend PITs expire without renewal; expiry cleanup needs no worker.
 
 Cursors and their signing key are intentionally process-local. Restart requires
-a fresh search. Multiple API instances, durable cursor recovery, auth-derived
-tenant binding and distributed quotas are not implemented. Backend node-level
+a fresh search. Opt-in JWT mode authorizes the tenant before cursor access;
+multiple API instances, durable cursor recovery and distributed quotas are not
+implemented. Backend node-level
 PIT limits remain relevant, including contexts left briefly by a killed process.
 
 See [ADR 0007](adr/0007-stable-search-pages.md) for the design and

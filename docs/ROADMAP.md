@@ -34,8 +34,17 @@ P4b's local functional gate now passes: React search/feed investigation,
 [console evidence](validation/P4b.md). P4 local functionality is implemented.
 A connected-browser visual/native-interaction review remains explicitly open;
 automated DOM tests are not a substitute for that review.
-Audited index-quarantine replay/retention
-remains an explicit open operational gate, along with the wider P5/P6 work.
+Audited index-quarantine source reconciliation is now implemented; arbitrary
+malformed-event replay is not claimed. Evidence is retained with explicit local
+admission caps; destructive lifecycle automation remains future design work.
+
+P5 now has signed-token tenant/merchant security tests and published baseline
+ranking/extraction measurements, including errors. Model integration remains
+optional and unimplemented. P6 now includes a bounded mixed-load observation,
+independent-database restore, tested runtime roles, protected metrics and non-root
+packaging. Representative load/freshness, patched production images, full browser
+certification, HA and deployed telemetry remain open; these are not silently
+replaced by the small local measurements. See [COMPLETION.md](COMPLETION.md).
 
 P3 is split into acceptance slices: P3a database-backed relay and failure recovery
 ([ADR 0003](adr/0003-outbox-delivery.md)); P3b actual Kafka delivery; P3c OpenSearch
