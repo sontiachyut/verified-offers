@@ -7,8 +7,16 @@ DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='offers_operator') THEN
         CREATE ROLE offers_operator NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
     END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname IN ('offers_runtime','offers_operator')
+               AND (rolsuper OR rolcreatedb OR rolcreaterole OR rolreplication OR rolbypassrls OR rolcanlogin)) THEN
+        RAISE EXCEPTION 'Expected unprivileged NOLOGIN application groups; refusing to adopt existing privileged roles';
+    END IF;
 END $$;
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+-- Dedicated database only: reconcile these two application groups, not unrelated roles.
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM offers_runtime,offers_operator;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM offers_runtime,offers_operator;
+REVOKE CREATE ON SCHEMA public FROM offers_runtime,offers_operator;
 GRANT USAGE ON SCHEMA public TO offers_runtime,offers_operator;
 GRANT SELECT,INSERT,UPDATE ON offer_key,offer_head,outbox,feed_job,feed_row TO offers_runtime;
 GRANT SELECT,INSERT ON offer_version,feed_action,outbox_replay,index_quarantine,index_route TO offers_runtime;

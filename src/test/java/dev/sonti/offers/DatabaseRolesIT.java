@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 class DatabaseRolesIT extends PostgresFixture {
     @Test void runtimeCanIngestAndPublishButCannotDestroyHistoryOrAdministerSchema() throws Exception {
         sql.execute(Files.readString(Path.of("ops/database-roles.sql")));
+        sql.execute("GRANT DELETE ON offer_version TO offers_runtime"); // Deliberate drift must be removed.
         sql.execute(Files.readString(Path.of("ops/database-roles.sql"))); // Administrative setup is repeatable.
         String password = UUID.randomUUID().toString();
         sql.execute("CREATE ROLE offers_test LOGIN PASSWORD '" + password + "' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION");

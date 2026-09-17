@@ -22,6 +22,11 @@ state transitions; use a distinct operator login, not the runtime service login.
 The script grants no default privileges on future tables: every migration needs
 an explicit permission review and updated role tests.
 
+Rerunning setup reconciles table/sequence privileges of these two application
+groups in the dedicated public schema, removing accidental grants before applying
+the allowlist. It refuses to adopt pre-existing privileged or LOGIN group roles.
+This is another reason not to run the script in an unrelated/shared database.
+
 This is database capability separation, not PostgreSQL row-level tenant security.
 The trusted application credential reads multiple tenants; authenticated HTTP
 authorization is the tenant boundary. A compromised application login remains a
