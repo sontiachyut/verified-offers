@@ -44,5 +44,9 @@ Optional multi-node/cloud experiments are not local correctness evidence.
 1. Release acceptance ledger: establishes the remaining gates before code changes.
 2. Token policy: mandatory bounded identity/times/audience, with 9 focused policy
    and existing HTTP tests passing; explicit unauthenticated local filter chain.
+3. Catalog/search authorization: five policy tests plus existing HTTP regression.
+4. Feed authorization: every feed route rejects before touching the store.
+5. Signed JWT resource server: eight real HTTP tests with ephemeral RSA/JWKS;
+   wrong signature, issuer, audience, scope, identity and expiry fail closed.
 
 Further entries are appended with the implemented behavior and focused evidence.
