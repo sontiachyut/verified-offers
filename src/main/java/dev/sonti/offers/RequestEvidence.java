@@ -21,6 +21,7 @@ final class RequestEvidence extends OncePerRequestFilter {
     static String operation(String path) {
         if (path.equals("/api/v1/search")) return "search";
         if (path.equals("/api/v1/verifications")) return "verification";
+        if (path.equals("/api/v1/claims/extract")) return "extraction";
         if (path.equals("/api/v1/offers") || path.startsWith("/api/v1/offers/")) return "catalog";
         if (path.startsWith("/api/v1/feeds/")) return "feed";
         if (path.equals("/api/v1/readiness")) return "readiness";

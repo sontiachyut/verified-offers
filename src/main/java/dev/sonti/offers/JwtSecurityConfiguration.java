@@ -49,7 +49,7 @@ class JwtSecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/offers").hasAuthority("SCOPE_offers:write")
                         .requestMatchers(HttpMethod.GET, "/api/v1/offers/**", "/api/v1/search", "/api/v1/feeds/**").hasAuthority("SCOPE_offers:read")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/verifications").hasAuthority("SCOPE_offers:read")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/verifications", "/api/v1/claims/extract").hasAuthority("SCOPE_offers:read")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/search").hasAuthority("SCOPE_offers:read")
                         .requestMatchers(HttpMethod.POST, "/api/v1/feeds/*/*/*/retry", "/api/v1/feeds/*/*/*/cancel").hasAuthority("SCOPE_offers:operate")
                         .requestMatchers(HttpMethod.POST, "/api/v1/feeds/*/*").hasAuthority("SCOPE_offers:write")
