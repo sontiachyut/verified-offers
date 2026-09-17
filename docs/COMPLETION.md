@@ -4,7 +4,7 @@ Started 2026-09-16 from `1055653`. This is an evidence checklist, not a promise
 of production readiness. Commits record actual work at actual times. Each
 milestone is pushed independently; no empty commits or manufactured history.
 
-## Remaining release gates
+## Local release gates
 
 - [x] Signed JWT authentication, issuer/audience/time validation, safe failures
 - [x] Tenant and merchant object authorization across existing HTTP routes
@@ -26,7 +26,14 @@ milestone is pushed independently; no empty commits or manufactured history.
 - [x] Non-root, pinned application packaging and isolated HTTP smoke test
 - [x] Finished-image vulnerability scan and documented remediation/review; remaining findings are not waived
 - [x] Operational runbooks and threat model
-- [ ] Full Java, console, dependency integration and CI regression on release HEAD
+- [x] Full local Java, console and real-dependency regression, plus packaged-image smoke
+
+CI repeats these gates on every push, including the hardened-container smoke.
+Its exact-SHA result is external evidence in
+[GitHub Actions](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml),
+not a manually checked box. Require a successful run for the handoff revision;
+cancelled or older runs do not satisfy that gate. See the
+[final local evidence](validation/RELEASE-2026-09-16.md).
 
 Existing evidence remains in `validation/P4b.md` and earlier validation records.
 The owner accepted the console appearance; this is not automated browser or
@@ -78,6 +85,14 @@ Optional multi-node/cloud experiments are not local correctness evidence.
 30. Published 200-search/40-update observation and explicit scale limitations.
 31. Immutable feed-control audit now records verified actor subject, never a caller-supplied label.
 32. Preserved feed semaphore admission before streaming upload bytes.
+33. Consolidated implemented behavior, threat model and unresolved release risks.
+34. Updated phase status and acknowledged-PIT-deletion lifecycle documentation.
+35. Aligned local walkthroughs with optional identity and actor attribution.
+36. Patched embedded Tomcat and added isolated digest-pinned image scanning.
+37. Added hardened-image build and HTTP smoke to the CI acceptance job.
+38. Made database grants converge on the allowlist and reject privileged groups.
+39. Published unsuppressed before/after image scans: critical findings 3 to 0.
+40. Fixed the real-API console fixture to require a continuable indexed snapshot.
 
 Every numbered milestone above corresponds to a real commit after `1055653`;
 use `git log --reverse --oneline 1055653..HEAD` for exact hashes and dates.

@@ -41,19 +41,34 @@ Last updated: 2026-09-16 (local time).
 
 ## Current verification checkpoint
 
-A full local regression passed 100 unit/HTTP/helper tests plus 85 real-dependency/
-process tests (185 total, zero failures/errors/skips) before the final actor-audit
-and streaming-admission hardening. The subsequent focused JWT/feed/admission
-regression passed with Flyway V8. Final full regression, image vulnerability scan,
-console checks and exact-HEAD CI must be recorded before release handoff.
-Heavy local checks run sequentially with bounded JVMs; no paid infrastructure.
+The final local backend regression passed **101 unit/HTTP/helper tests plus 85
+real-dependency/process tests (186 total, zero failures/errors/skips)**, including
+Flyway V8 actor audit, feed admission, restricted-role grant reconciliation and
+Tomcat 11.0.26. Console checks passed all 38 focused tests, formatting, TypeScript
+and production build; the real-API React walkthrough and four-assertion HTTP demo
+also passed. A fixture readiness race was fixed without changing product behavior.
+
+The rebuilt non-root/read-only container smoke passed. Finished-image scanning
+identified three critical Tomcat findings, all absent after the patch and rescan:
+0 critical, 0 high, 53 medium and 16 low remain on linux/arm64. Dependency-image
+findings remain separate deployment blockers; no findings were suppressed.
+See [final local evidence](validation/RELEASE-2026-09-16.md) and the
+[before/after scan](validation/APPLICATION-IMAGE-SECURITY.md).
+
+CI repeats backend, console, real-API and hardened-container gates on every push.
+The exact revision's result is maintained in GitHub Actions, not inferred from a
+previous or cancelled run. Heavy local checks ran sequentially with bounded JVMs;
+no paid infrastructure or inference was used.
 
 ## Exact next gate
 
-Finish the final verification/scan evidence and synchronize the release checklist.
-Do not mark the original specification 100% production-ready based on these
-local functional results. If the owner wants deployment or representative-scale
-testing, obtain environment/cost/security choices first.
+The implemented local release checks are complete. Verify the exact pushed SHA's
+[CI result](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml)
+before handoff. Next, obtain the owner's environment/resource/security choices
+for representative sustained-load testing and any shared deployment. Do not run
+the proposed stress workload on a hot laptop or create paid/public resources.
+The original specification is not 100% production-ready; the remaining gates
+below are not replaced by the local acceptance results.
 
 ## Operational boundaries
 
