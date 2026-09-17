@@ -1,0 +1,4 @@
+{"tenantId":"demo","merchantId":"synthetic","offerId":"feed-keyboard","version":1,"title":"Synthetic feed keyboard","priceMinor":9900,"currency":"USD","availableQuantity":5,"sourceUpdatedAt":"2026-09-01T12:00:00Z","deleted":false}
+{"tenantId":"demo","merchantId":"synthetic","offerId":"feed-keyboard","version":1,"title":"Synthetic feed keyboard","priceMinor":9900,"currency":"USD","availableQuantity":5,"sourceUpdatedAt":"2026-09-01T12:00:00Z","deleted":false}
+not-json-synthetic-fixture
+{"tenantId":"demo","merchantId":"synthetic","offerId":"feed-keyboard","version":2,"title":"Synthetic feed keyboard","priceMinor":10900,"currency":"USD","availableQuantity":4,"sourceUpdatedAt":"2026-09-01T12:01:00Z","deleted":false}

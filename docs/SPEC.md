@@ -16,8 +16,9 @@ The bounded local handoff gate is implemented.
 P3c3 clarification: ADR 0007 defines bounded PIT/search-after pages, process-local
 signed cursors and authoritative verification on every page. The local API now
 supports this contract; cursors expire on process restart and are not HA state.
-P4a design: ADR 0008 specifies bounded NDJSON admission, immutable feed provenance,
-durable row receipts, fenced workers and restart/retry/cancel behavior.
+P4a clarification: ADR 0008 defines implemented bounded NDJSON admission,
+immutable feed provenance, durable row receipts, fenced workers and tested
+restart/retry/cancel behavior. The P4b UI remains a separate acceptance gate.
 
 ## Product and boundaries
 

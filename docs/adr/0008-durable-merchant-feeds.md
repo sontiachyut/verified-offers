@@ -1,6 +1,6 @@
 # ADR 0008: bounded, durable merchant feed jobs
 
-Date: 2026-09-16. Accepted for P4a implementation.
+Date: 2026-09-16. Implemented and acceptance-tested for the local P4a gate.
 
 Input is UTF-8 NDJSON, one complete Offer per line. No CSV inference, remote URL
 fetch, compression, archive, local path or real merchant data. Limit uploads to

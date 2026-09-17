@@ -4,7 +4,7 @@ Check whether a merchant offer is current and supported by its source facts.
 
 [![verify](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml/badge.svg)](https://github.com/sontiachyut/verified-offers/actions/workflows/ci.yml)
 
-An incremental backend engineering project. **Kafka now feeds an OpenSearch projection, and search rechecks current PostgreSQL facts before returning verified offers.** This is a local development system, not a production deployment or a large-scale performance claim.
+An incremental backend engineering project. **Durable merchant feeds flow through PostgreSQL and Kafka into search, which rechecks current source facts before returning verified offers.** This is a local development system, not a production deployment or a large-scale performance claim.
 
 ## Run it
 
@@ -39,12 +39,19 @@ The [coordinated handoff runbook](docs/HANDOFF.md) adds bounded Kafka catch-up,
 full candidate validation and recoverable alias switching. It explicitly pauses
 indexing during the handoff; it is not a zero-downtime claim.
 
+The [merchant-feed walkthrough](docs/FEEDS.md) covers bounded NDJSON uploads,
+durable progress, per-row receipts, retry/cancellation and restart recovery.
+It includes a [mixed synthetic example](examples/feed-mixed.ndjson) exercised
+against the packaged API. Feed ingestion and its worker are opt-in separately.
+
 Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full acceptance gate.
 
 ## What works today
 
 - Versioned offer ingestion with identical replay, conflicting/older-version rejection and deterministic claim verification.
 - PostgreSQL facts, immutable version history and transactional outbox; Flyway migrations.
+- Durable feed jobs with exact-byte checksum/idempotency, immutable source provenance and bounded row reports. Each successful row's catalog update, outbox event and receipt commit together.
+- Lease-fenced feed workers, bounded batches/retries, operator-audited retry/cancellation and forced-process restart recovery. Bad rows do not block valid rows; cancelled work does not undo committed offers.
 - Concurrent first-write serialization, tenant-key separation, timestamp normalization and rollback on outbox failure.
 - Packaged API restart recovery: committed offers survive a forced JVM stop without duplicate events.
 - An outbox relay with worker leases, expiry fencing, bounded retries, quarantine and audited replay.
@@ -54,13 +61,13 @@ Without Docker, `./mvnw test` runs only unit/in-memory HTTP tests—not the full
 - Stable PIT/search-after pagination through refreshes and alias handoffs, with signed short-lived cursors, cancellation and bounded resource admission. Cursors are process-local, not HA state. See the [pagination guide](docs/PAGINATION.md).
 - A resumable shadow-rebuild engine: durable PostgreSQL snapshots, fenced leases, bounded batches and full-content/version/count validation. Validated shadows stay read-only and never replace the live index automatically.
 - Coordinated rebuild with topic-identity/retention checks, source-validated Kafka catch-up, durable indexing pause and atomic alias handoff. Interrupted switches reconcile forward; unsafe rollback is refused.
-- 110 passing tests, including actual database/broker/index integration, delayed consumer acknowledgements, interrupted handoff recovery, stable pagination through source/index changes, packaged HTTP/operator commands and outage recovery. See [pagination evidence](docs/validation/P3c3.md) and [handoff evidence](docs/validation/P3c2b.md).
+- 134 passing tests, including actual database/broker/index integration, atomic feed rollback, forced worker restart, full feed-to-search delivery, stable pagination and interrupted index handoff recovery. See [feed evidence](docs/validation/P4a.md), [pagination evidence](docs/validation/P3c3.md) and [handoff evidence](docs/validation/P3c2b.md).
 
 A verified response is an as-of fact check, **not a stock reservation or checkout-price guarantee**.
 
 ## Next phases — not yet implemented
 
-Durable merchant feed jobs and a React investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
+React search/feed-investigation console. Optional Python claim extraction follows an independently evaluated deterministic baseline.
 
 Publishing, indexing and search are disabled unless explicitly enabled under the persistent local profile. Authentication, audited index-quarantine replay, operational hardening, backup/restore and representative load measurements remain open. No cloud resources have been provisioned. The pinned [database](docs/validation/IMAGE-SECURITY.md), [Kafka](docs/validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch](docs/validation/OPENSEARCH-IMAGE-SECURITY.md) images require security review; public deployment is not approved.
 

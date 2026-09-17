@@ -17,50 +17,34 @@ Last updated: 2026-09-16
 - P3c2b: pre-snapshot Kafka topic/offset boundary, durable live-indexer pause, bounded source-validated replay, separately validated candidate, atomic alias handoff and forward reconciliation after a lost acknowledgement. Safe pre-switch abort is available; post-switch rollback is refused. See [ADR 0006](adr/0006-coordinated-index-handoff.md).
 - Coordinated begin/step/status/abort commands work across packaged JVM restarts, including inherited-worker override protection. See the [handoff runbook](HANDOFF.md). This uses an indexing pause, not zero-downtime cutover.
 - P3c3: bounded PIT/search-after pages, deterministic ordering, signed process-local cursors, current PostgreSQL verification on every page, cancellation and fixed expiry. Real index refresh/handoff/outage and packaged HTTP/restart tests pass. See [ADR 0007](adr/0007-stable-search-pages.md), [guide](PAGINATION.md) and [evidence](validation/P3c3.md).
-- 49 unit/HTTP/helper plus 61 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (110 total). The four-assertion HTTP demo also passes. The adapter milestone `8ba963d` separately passed 101 tests before API wiring. No benchmark or production readiness is implied.
+- P4a: bounded UTF-8 NDJSON admission with exact-byte checksum/idempotency, immutable provenance, durable per-row results and atomic catalog/outbox/receipt commits. Fenced workers, retry pause, scoped audited retry/cancel, HTTP/CLI progress and forced-process restart recovery are tested. See [ADR 0008](adr/0008-durable-merchant-feeds.md), [walkthrough](FEEDS.md) and [evidence](validation/P4a.md).
+- The mixed synthetic example is tested through the packaged API; old source facts remain stale. The complete feed → PostgreSQL outbox → Kafka → verified search flow passes against real dependencies. Feed completion itself does not promise downstream search visibility.
+- 59 unit/HTTP/helper plus 75 PostgreSQL/Kafka/OpenSearch/process integration tests pass locally with zero failures/errors/skips (134 total). The four-assertion HTTP demo also passes. Feed milestones separately passed 54 unit, 124 full and 133 full tests before the final example gate. No benchmark or production readiness is implied.
 - Concurrent ingestion, immutable history, replay/conflicts, rollback and forced-process restart recovery tested.
 - CI runs the same full Maven acceptance gate, then the HTTP walkthrough. Check its result against the exact pushed main revision, not Dependabot branches.
 
-## Exact next task: P4a merchant feed jobs
+## Exact next task: P4b search/feed investigation UI
 
-P4a contract recorded in [ADR 0008](adr/0008-durable-merchant-feeds.md): bounded
-NDJSON, checksum/idempotency, immutable provenance, atomic per-row receipts,
-lease/retry/cancel behavior and full acceptance requirements. Implementation
-is in progress; no feed feature is claimed complete by this design milestone.
-Parser slice: bounded UTF-8/NDJSON admission, exact-byte SHA-256, strict schema
-validation and sanitized per-line errors are implemented. `./mvnw test` passes
-54 tests, including five new parser tests; full integration acceptance remains
-pending the durable job engine/API slices.
-Durable engine slice: V6 feed provenance/receipts, atomic catalog/outbox/row
-transactions, bounded workers, lease fencing, retry pause, scoped cancellation
-and audited actions now pass the full Maven gate: 124 tests (54 unit/helper,
-70 integration), zero failures/errors/skips. Nine real PostgreSQL feed tests
-cover admission races, rollback, takeover, parallel workers and immutable receipts.
-HTTP/CLI and packaged process recovery are still the next P4a acceptance slice.
-HTTP/worker slice now passes the full Maven gate: 133 tests (59 unit/helper,
-74 integration), zero failures/errors/skips. Includes chunked upload bounds,
-four-upload admission, packaged status/step, forced worker JVM interruption,
-restart recovery and feed → Kafka → verified search. Final P4a walkthrough,
-shipped example validation and handoff documentation are being completed.
-
-The local P3 functional gate is complete, including rebuild and stable pages.
-Define the bounded feed-upload and durable job contract before implementation:
-input/row limits, checksum/idempotency, source provenance, per-row results,
-worker ownership and restart behavior. Reuse catalog ingestion invariants and
-the transactional outbox, without holding a transaction across an entire feed.
-Prove partial failures, duplicate submission and crash/restart recovery with
-synthetic fixtures. No arbitrary URL fetch or real merchant data. The React
-search/investigation UI follows the durable feed backend in P4b.
-Audited index-quarantine replay/retention remains an explicit operational gate.
+P4a backend acceptance is complete; the combined P4 phase remains open for its UI.
+Define a small accessible React/TypeScript console around existing contracts:
+verified search with provenance/as-of evidence, cursor expiry/continuation and
+empty-page behavior; bounded feed upload; job/row progress and fixed errors;
+explicit retry/cancel confirmations and visible partial-commit semantics.
+Keep tenant scope labeled as unauthenticated local demo scope. Do not create a
+second authority for verification in the browser. Test loading/empty/error states,
+keyboard accessibility and an end-to-end synthetic walkthrough. No public hosting
+or real data without the existing security/deployment approval gates.
+Audited index-quarantine replay/retention remains an open operational gate.
 
 ## Explicit limits / open decisions
 
 - postgres-local persists state; local-demo remains volatile. Both profiles are unauthenticated and loopback-only. No real data or public exposure.
-- Publishing, search and indexing are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Default still accumulates outbox rows. No feed pipeline, UI or model integration yet.
+- Publishing, search, indexing and feeds are independently opt-in under postgres-local; indexer requires search configuration. Explicit endpoint/alias/bootstrap/group values are required. Feed background processing has its own enable flag. No UI or model integration yet.
 - Images require security remediation/review: see [database scan](validation/IMAGE-SECURITY.md), [Kafka scan](validation/KAFKA-IMAGE-SECURITY.md) and [OpenSearch scan](validation/OPENSEARCH-IMAGE-SECURITY.md). Re-scan, production database roles, auth, restore drills and cloud sizing/cost remain deployment gates.
 - Correctness tests are not throughput, uptime, failover or representative scale measurements.
 - No billable cloud resources were created. The seven-session sprint is a planning aid, not a completeness promise.
 - Shadow snapshots are capped at 100,000 offers and ten retained jobs; a successful handoff uses two jobs. Replay is capped at 10,000 offsets and 32 partitions. Cleanup/retention is not implemented. SNAPSHOT_VALIDATED alone is not promotion approval.
 - All live indexers must run the gate-aware build. Mixed versions, foreign/transactional/compacted topic writers and manual concurrent alias administration are unsupported. A pause survives crashes; SWITCHING recovers forward, never by blind rollback. Retention loss during an uncertain switch can require reviewed repair.
 - Search cursors are process-local, fixed at two minutes and invalid after restart. At most 128 reservations and eight in-flight page operations per process; completed/failed searches retain admission reservations for the expiry plus ten-second grace. This is a conservative local bound, not an HA/distributed quota or capacity result.
-- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0007.
+- Feeds are bounded at 1 MiB/1,000 rows/4 KiB per line, four concurrent uploads per process, 100 retained jobs globally and 20 operator actions per job. Immutable provenance/receipts are retained; no cleanup endpoint exists. Retry/cancel are unauthenticated local-operator actions, not an auth audit. Cancellation never undoes committed rows.
+- Future work is not automatically scheduled. Resume from this file, ROADMAP.md and ADRs 0003–0008.

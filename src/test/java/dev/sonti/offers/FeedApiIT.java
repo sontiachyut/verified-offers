@@ -95,6 +95,26 @@ class FeedApiIT extends PostgresFixture {
         command(2, "--feed=step", "--offers.feeds.worker-enabled=true");
         assertThat(sql.queryForObject("SELECT count(*) FROM outbox WHERE published_at IS NOT NULL", Integer.class)).isZero();
     }
+    @Test void shippedMixedExampleMatchesRunbookAndDoesNotRefreshHistoricalFacts() throws Exception {
+        byte[] body = java.nio.file.Files.readAllBytes(java.nio.file.Path.of("examples/feed-mixed.ndjson"));
+        String path = "/api/v1/feeds/demo/synthetic";
+        try (var app = new RunningApplication("--offers.feeds.enabled=true", "--offers.feeds.worker-enabled=true")) {
+            String id = app.rawRequest("POST", path, body, headers(body), false, 202).path("job").path("id").asString();
+            RunningApplication.awaitReady(() -> true, () -> "COMPLETED_WITH_ERRORS".equals(
+                    app.request("GET", path + "/" + id, null, 200).path("state").asString()), Duration.ofSeconds(15));
+            var job = app.request("GET", path + "/" + id, null, 200);
+            assertThat(job.path("processed").asInt()).isEqualTo(4);
+            assertThat(job.path("applied").asInt()).isEqualTo(2);
+            assertThat(job.path("replayed").asInt()).isEqualTo(1);
+            assertThat(job.path("rejected").asInt()).isEqualTo(1);
+            assertThat(app.request("GET", path + "/" + id + "/rows", null, 200).path("rows"))
+                    .extracting(row -> row.path("state").asString()).containsExactly("APPLIED", "REPLAYED", "REJECTED", "APPLIED");
+            var claim = Map.of("tenantId", "demo", "merchantId", "synthetic", "offerId", "feed-keyboard", "priceMinor", 10900, "currency", "USD");
+            assertThat(app.request("POST", "/api/v1/verifications", claim, 200).path("outcome").asString()).isEqualTo("STALE");
+            assertThat(app.rawRequest("POST", path, body, headers(body), false, 200).path("job").path("id").asString()).isEqualTo(id);
+            assertThat(sql.queryForObject("SELECT count(*) FROM outbox", Integer.class)).isEqualTo(2);
+        }
+    }
     private JsonNode command(int expected, String... arguments) throws Exception {
         var args = new ArrayList<>(List.of(System.getProperty("java.home") + "/bin/java", "-jar", "target/verified-offers-0.1.0-SNAPSHOT.jar"));
         args.addAll(List.of(arguments));

@@ -34,4 +34,8 @@ Testcontainers starts isolated databases on dynamic ports and removes its test c
 
 An identity row lock serializes concurrent first writes and later updates. History is immutable to normal UPDATE/DELETE, a head points to a committed version, and an outbox envelope is committed atomically. Timestamps normalize to microseconds before equality/hash checks.
 
-Outbox publication is NOT implemented. Rows accumulate locally; there are no Kafka delivery guarantees yet. Backup/restore, failover, auth and production role separation remain deployment gates. Read ADR 0002 for transaction and failure decisions.
+Outbox rows accumulate unless the opt-in [Kafka publisher](KAFKA.md) is enabled.
+The [feed worker](FEEDS.md) is a separate opt-in: feed completion means durable
+catalog/outbox commit, not Kafka acknowledgement or immediate search visibility.
+Backup/restore, failover, auth and production role separation remain deployment
+gates. Read ADR 0002 for transaction and failure decisions.

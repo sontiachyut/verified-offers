@@ -26,8 +26,11 @@ changes; see [rebuild evidence](validation/P3c2a.md). P3c2b now adds bounded Kaf
 catch-up and a coordinated, recoverable alias switch with an indexing pause;
 see [handoff evidence](validation/P3c2b.md). P3c3 now adds bounded stable PIT pages
 with current source verification; see [pagination evidence](validation/P3c3.md).
-The local P3 functional gate is complete. P4a durable merchant feed jobs are next,
-followed by P4b search/investigation UI. Audited index-quarantine replay/retention
+The local P3 functional gate is complete. P4a durable merchant feed jobs are now
+complete: bounded admission, atomic row receipts, restart recovery and the tested
+feed-to-search pipeline; see [feed evidence](validation/P4a.md).
+P4b search/feed-investigation UI is next; the combined P4 phase stays open.
+Audited index-quarantine replay/retention
 remains an explicit open operational gate, along with the wider P5/P6 work.
 
 P3 is split into acceptance slices: P3a database-backed relay and failure recovery
