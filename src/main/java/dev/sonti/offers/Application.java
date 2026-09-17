@@ -10,6 +10,11 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
+        if (java.util.Arrays.stream(args).anyMatch(arg -> arg.startsWith("--reconcile="))) {
+            int exit = ReconciliationCommand.run(args);
+            if (exit != 0) System.exit(exit);
+            return;
+        }
         if (java.util.Arrays.stream(args).anyMatch(arg -> arg.startsWith("--feed="))) {
             int exit = FeedCommand.run(args);
             if (exit != 0) System.exit(exit);
