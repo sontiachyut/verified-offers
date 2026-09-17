@@ -47,6 +47,7 @@ class JwtSecurityConfiguration {
                 .requestCache(c -> c.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/readiness", "/actuator/prometheus").hasAuthority("SCOPE_offers:operate")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/offers").hasAuthority("SCOPE_offers:write")
                         .requestMatchers(HttpMethod.GET, "/api/v1/offers/**", "/api/v1/search", "/api/v1/feeds/**").hasAuthority("SCOPE_offers:read")
                         .requestMatchers(HttpMethod.POST, "/api/v1/verifications", "/api/v1/claims/extract").hasAuthority("SCOPE_offers:read")
