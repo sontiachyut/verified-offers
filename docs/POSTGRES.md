@@ -1,6 +1,10 @@
 # PostgreSQL local profile
 
-The postgres-local profile persists state across application restarts. It is still unauthenticated and loopback-only, with a migration-capable local database role. Do not expose it to the internet or use real data.
+The postgres-local profile persists state across application restarts. This
+walkthrough uses the unauthenticated loopback-only default and a migration-capable
+development credential. Opt-in [JWT mode](AUTHENTICATION.md) and separately
+provisioned [runtime roles](DATABASE-ROLES.md) are available. Do not expose this
+local stack to the internet or use real data.
 
 ## Start a development database
 

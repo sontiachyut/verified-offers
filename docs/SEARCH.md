@@ -1,7 +1,9 @@
 # Local search walkthrough
 
-Synthetic data only. API, PostgreSQL, Kafka and OpenSearch are unauthenticated
-local development services, not a production deployment. Keep loopback bindings.
+Synthetic data only. This walkthrough uses the unauthenticated local API default
+and plaintext local broker/index services, not a production deployment. Optional
+API [JWT mode](AUTHENTICATION.md) does not secure those dependency listeners.
+Keep loopback bindings.
 OpenSearch adds a 512 MiB JVM heap plus native overhead. Stop the stack when done.
 Requirements: Java 21, Docker (at least 4 GiB available), Compose, curl, jq.
 

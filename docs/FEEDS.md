@@ -1,8 +1,10 @@
 # Durable merchant feeds
 
 P4a local backend: upload a bounded NDJSON file, inspect durable per-row progress,
-and recover work after worker failure. Synthetic data only, loopback-only and
-unauthenticated. Tenant/merchant path parameters are scope, not authentication.
+and recover work after worker failure. Synthetic data only and loopback-only.
+This walkthrough uses the unauthenticated default: path parameters alone are
+not authentication. [JWT mode](AUTHENTICATION.md) checks them against verified
+tenant/merchant identity before storage access.
 The [local investigation console](CONSOLE.md) wraps these APIs. Production
 identity/roles, retention and load experiments remain separate.
 
@@ -138,8 +140,10 @@ offers, tombstones, outbox publication or search updates.** Retry is not undo;
 terminal jobs cannot be retried or cancelled. Invalid-state actions return 409.
 
 GET `/<job-uuid>/actions` returns the retained RETRY/CANCEL audit, including the
-reason identifier and database timestamp. There are at most 20 actions per job.
-This is a local operator audit, not proof of an authenticated actor.
+reason identifier, database timestamp, actorSubject and authenticated marker.
+There are at most 20 actions per job. JWT-mode actions record the verified token
+subject, not a body field. Legacy/local actions are explicitly marked
+`local-operator`, authenticated=false; never retroactively attribute them.
 
 ## Crash safety and shutdown
 
