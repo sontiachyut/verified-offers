@@ -84,7 +84,13 @@ it('runs the React feed → real PostgreSQL/Kafka/OpenSearch → verified eviden
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Search offers' })).toBeEnabled(),
     );
-    if (screen.queryAllByRole('button', { name: /Inspect Console acceptance/ }).length === 5) break;
+    // Five indexed rows can be an exhausted snapshot while the sixth is still
+    // in flight. A continuation proves this snapshot includes more candidates.
+    if (
+      screen.queryAllByRole('button', { name: /Inspect Console acceptance/ }).length === 5 &&
+      screen.queryByRole('button', { name: 'Continue search' })
+    )
+      break;
     await act(() => delay(300));
   }
   expect(screen.getAllByRole('button', { name: /Inspect Console acceptance/ })).toHaveLength(5);

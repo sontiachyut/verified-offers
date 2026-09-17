@@ -71,6 +71,14 @@ still fail. Production capture/rebuild behavior is unchanged; no suite is skippe
 
 ## Explicit limits
 
+The September 16 release regression exposed another fixture readiness race:
+five visible offers did not prove the sixth had reached the asynchronously
+refreshed index. A five-result exhausted PIT legitimately has no continuation.
+The test now waits for both five results AND a continuation control in the same
+snapshot before the original six-result assertion. It still has a finite retry
+bound and performs explicit searches; no product polling, forced index refresh,
+skipped assertion or pagination semantic change was introduced.
+
 - No connected browser was available in this session. Visual viewport/contrast
   review and native file-dialog/focus-trap checks were not performed. Responsive
   CSS and keyboard/DOM tests are implemented, but must not be mislabeled as a
