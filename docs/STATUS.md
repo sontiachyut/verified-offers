@@ -28,7 +28,10 @@ Last updated: 2026-09-16
 P4b in progress: `console/` now has the local React/Vite search workspace,
 lossless integer evidence, frozen cursor scope, explicit expiry/retry, and
 best-effort abandoned-search release. Ten interaction/API tests and TypeScript
-checks pass. Feed UI and final acceptance remain open; see ADR 0009.
+checks passed at the first milestone. Feed upload, job/row/action views and
+confirmations are now implemented. The expanded 37-test console suite, DOM
+accessibility checks, formatting, TypeScript and build pass; real-API walkthrough
+and final backend regression are the remaining acceptance checks. See ADR 0009.
 
 P4a backend acceptance is complete; the combined P4 phase remains open for its UI.
 Define a small accessible React/TypeScript console around existing contracts:
