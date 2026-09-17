@@ -42,5 +42,7 @@ Optional multi-node/cloud experiments are not local correctness evidence.
 ## Milestone record
 
 1. Release acceptance ledger: establishes the remaining gates before code changes.
+2. Token policy: mandatory bounded identity/times/audience, with 9 focused policy
+   and existing HTTP tests passing; explicit unauthenticated local filter chain.
 
 Further entries are appended with the implemented behavior and focused evidence.
