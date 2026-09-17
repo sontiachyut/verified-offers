@@ -1,0 +1,12 @@
+{
+  "restoredLeaseReplay" : true,
+  "restoredTombstone" : true,
+  "kind" : "logical-pg-dump-independent-container",
+  "dumpBytes" : 40135,
+  "feedReceipts" : 2,
+  "productionRpoRtoMeasured" : false,
+  "restoredIdempotency" : true,
+  "elapsedMillisIncludingTargetStartup" : 1383,
+  "restoredImmutableTriggers" : true,
+  "historyVersions" : 2
+}
