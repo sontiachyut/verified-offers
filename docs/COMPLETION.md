@@ -1,0 +1,46 @@
+# Release acceptance ledger
+
+Started 2026-09-16 from `1055653`. This is an evidence checklist, not a promise
+of production readiness. Commits record actual work at actual times. Each
+milestone is pushed independently; no empty commits or manufactured history.
+
+## Remaining release gates
+
+- [ ] Signed JWT authentication, issuer/audience/time validation, safe failures
+- [ ] Tenant and merchant object authorization across every HTTP route
+- [ ] Separate read, write and operator scopes; deny-by-default routing
+- [ ] Authenticated HTTP isolation tests with real signatures
+- [ ] Bounded request bodies and per-tenant request admission
+- [ ] Safe request correlation and bounded operational metrics
+- [ ] Documented identity-provider integration and security threat model
+- [ ] Audited, bounded index-quarantine resolution without trusting poison data
+- [ ] Recovery tests covering retries, failures and audit preservation
+- [ ] Explicit retention decisions that preserve replay and forensic evidence
+- [ ] Independently labeled lexical relevance dataset and reproducible evaluation
+- [ ] Claim-extraction baseline with held-out labels and error analysis
+- [ ] No AI quality claim without measured comparison; no paid inference by default
+- [ ] Dependency readiness distinct from liveness
+- [ ] Reproducible, bounded load experiment with raw results and hardware metadata
+- [ ] Backup/restore drill against real PostgreSQL
+- [ ] Least-privilege database role verification
+- [ ] Non-root, pinned application packaging and vulnerability review
+- [ ] Operational runbooks, release checklist and current architecture narrative
+- [ ] Full Java, console, dependency integration and CI regression on release HEAD
+
+Existing evidence remains in `validation/P4b.md` and earlier validation records.
+The owner accepted the console appearance; this is not automated browser or
+screen-reader certification.
+
+## Boundaries that cannot be silently checked off
+
+Public deployment, paid cloud or model inference, real merchants and secrets
+require separate owner approval. Hardware-limited load results must report the
+actual workload, not imply the proposed 100k-offer/100-search-per-second target
+was reached. Unresolved image vulnerabilities remain explicit deployment gates.
+Optional multi-node/cloud experiments are not local correctness evidence.
+
+## Milestone record
+
+1. Release acceptance ledger: establishes the remaining gates before code changes.
+
+Further entries are appended with the implemented behavior and focused evidence.
