@@ -14,7 +14,7 @@ class FeedAdmissionTest {
     @Test void fourConcurrentUploadsBoundMemoryAndFifthIsRejectedWithoutReading() throws Exception {
         var store = mock(FeedStore.class);
         when(store.submit(anyString(), anyString(), anyString(), anyString(), any())).thenReturn(new FeedStore.Accepted(null, true));
-        var api = new FeedApi(store, new FeedInput(Clock.systemUTC()));
+        var api = new FeedApi(store, new FeedInput(Clock.systemUTC()), new ApiAccess(false));
         byte[] bytes = "{}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         var entered = new CountDownLatch(4); var release = new CountDownLatch(1);
         try (var executor = Executors.newFixedThreadPool(4)) {

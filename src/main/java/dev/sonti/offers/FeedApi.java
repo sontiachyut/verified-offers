@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.*;
 class FeedApi {
     private final FeedStore store;
     private final FeedInput parser;
+    private final ApiAccess access;
     private final Semaphore uploads = new Semaphore(4);
-    FeedApi(FeedStore store, FeedInput parser) { this.store = store; this.parser = parser; }
+    FeedApi(FeedStore store, FeedInput parser, ApiAccess access) { this.store = store; this.parser = parser; this.access = access; }
     @PostMapping(consumes = "application/x-ndjson")
     ResponseEntity<FeedStore.Accepted> upload(@PathVariable String tenantId, @PathVariable String merchantId,
             @RequestHeader("Idempotency-Key") String key, @RequestHeader("X-Content-SHA256") String sha,
             @RequestHeader("X-Feed-Source") String source, HttpServletRequest request) throws IOException {
+        access.write(tenantId, merchantId);
         Input.identifier(key); Input.identifier(source);
         if (request.getHeader("Content-Encoding") != null) throw new DomainException(415, "Encoded feeds are not supported.");
         if (!uploads.tryAcquire()) throw new DomainException(429, "Feed upload capacity reached.");
@@ -36,25 +38,30 @@ class FeedApi {
     @GetMapping
     FeedStore.Jobs jobs(@PathVariable String tenantId, @PathVariable String merchantId,
             @RequestParam(required = false) UUID after, @RequestParam(defaultValue = "20") int limit) {
+        access.feedRead(tenantId, merchantId);
         return store.list(tenantId, merchantId, after, limit);
     }
     @GetMapping("/{id}")
     FeedStore.Job job(@PathVariable String tenantId, @PathVariable String merchantId, @PathVariable UUID id) {
+        access.feedRead(tenantId, merchantId);
         return store.get(tenantId, merchantId, id);
     }
     @GetMapping("/{id}/rows")
     FeedStore.Rows rows(@PathVariable String tenantId, @PathVariable String merchantId, @PathVariable UUID id,
             @RequestParam(defaultValue = "0") int after, @RequestParam(defaultValue = "100") int limit) {
+        access.feedRead(tenantId, merchantId);
         return store.rows(tenantId, merchantId, id, after, limit);
     }
     @GetMapping("/{id}/actions")
     List<FeedStore.Action> actions(@PathVariable String tenantId, @PathVariable String merchantId, @PathVariable UUID id) {
+        access.feedRead(tenantId, merchantId);
         return store.actions(tenantId, merchantId, id);
     }
     record Control(String reason) {}
     @PostMapping("/{id}/{action:retry|cancel}")
     FeedStore.Job control(@PathVariable String tenantId, @PathVariable String merchantId, @PathVariable UUID id,
             @PathVariable String action, @RequestBody Control body) {
+        access.operate(tenantId, merchantId);
         if (body == null) throw new IllegalArgumentException("Reason required.");
         return store.control(tenantId, merchantId, id, action.toUpperCase(java.util.Locale.ROOT), body.reason());
     }
