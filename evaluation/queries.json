@@ -1,0 +1,14 @@
+[
+  {"id":"q01","query":"mechanical keyboard","relevance":{"k1":3,"k2":3,"k3":1}},
+  {"id":"q02","query":"wireless mouse","relevance":{"m1":3,"k3":2,"m2":1}},
+  {"id":"q03","query":"USB C charger","relevance":{"a1":3,"a3":1}},
+  {"id":"q04","query":"noise cancelling headphones","relevance":{"h1":3,"h2":2,"h3":1}},
+  {"id":"q05","query":"portable SSD","relevance":{"s1":3,"s2":1,"s3":1}},
+  {"id":"q06","query":"4K monitor","relevance":{"d1":3,"d2":1}},
+  {"id":"q07","query":"webcam","relevance":{"c1":3}},
+  {"id":"q08","query":"ergonomic pointing device","relevance":{"m1":3}},
+  {"id":"q09","query":"laptop docking station","relevance":{"a4":3}},
+  {"id":"q10","query":"wireless router","relevance":{"n1":3}},
+  {"id":"q11","query":"USB C cable","relevance":{"a2":3}},
+  {"id":"q12","query":"monitor stand","relevance":{"d3":3}}
+]
